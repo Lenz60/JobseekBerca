@@ -1,9 +1,8 @@
 using JobseekBerca.Models;
-using JobseekBerca.View;
 
 namespace JobseekBerca.Repositories.Interfaces
 {
-    public interface IRoleRepository
+    public interface IRolesRepository
     {
         IEnumerable<Roles> GetAllRole();
         Roles GetRoleById(string roleId);

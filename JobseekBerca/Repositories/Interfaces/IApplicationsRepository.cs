@@ -1,12 +1,12 @@
-using JobseekBerca.Models;
-using JobseekBerca.View;
+//using JobseekBerca.Models;
+//using JobseekBerca.View;
 
-namespace JobseekBerca.Repositories.Interfaces
-{
-    public interface IJobsRepository
-    {
-        IEnumerable<Applications> GetAllApplication();
-        Applications GetApplicationById(string applicationId);
-        int UpdateApplications(Applications applications);
-    }
-}
+//namespace JobseekBerca.Repositories.Interfaces
+//{
+//    public interface IJobsRepository
+//    {
+//        IEnumerable<Applications> GetAllApplication();
+//        Applications GetApplicationById(string applicationId);
+//        int UpdateApplications(Applications applications);
+//    }
+//}

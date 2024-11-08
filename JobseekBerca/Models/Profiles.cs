@@ -14,11 +14,11 @@ namespace JobseekBerca.Models
     {
         [Key, ForeignKey("Users")]
         public string userId { get; set; }
-        public string full_name { get; set; }
-        public string summary { get; set; }
-        public Gender gender { get; set; }
-        public string address { get; set; }
-        public DateTime birthdate { get; set; }
+        public string fullName { get; set; }
+        public string? summary { get; set; }
+        public Gender? gender { get; set; }
+        public string? address { get; set; }
+        public DateTime? birthdate { get; set; }
         [JsonIgnore]
         public virtual Users? Users { get; set; }
 

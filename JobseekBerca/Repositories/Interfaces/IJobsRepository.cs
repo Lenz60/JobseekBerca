@@ -1,5 +1,4 @@
 using JobseekBerca.Models;
-using JobseekBerca.View;
 
 namespace JobseekBerca.Repositories.Interfaces
 {
