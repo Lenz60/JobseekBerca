@@ -1,6 +1,7 @@
 ﻿using JobseekBerca.Context;
 using JobseekBerca.Models;
 using JobseekBerca.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System.Data;
 
 namespace JobseekBerca.Repositories
@@ -13,6 +14,7 @@ namespace JobseekBerca.Repositories
             _myContext = myContext;
         }
 
+        public const int FAIL = 0;
         public int AddRole(Roles roles)
         {
             var checkId = _myContext.Roles.OrderByDescending(d => d.roleId).FirstOrDefault();
@@ -32,22 +34,32 @@ namespace JobseekBerca.Repositories
 
         public int DeleteRole(string roleId)
         {
-            throw new NotImplementedException();
+            var data = _myContext.Roles.Find(roleId);
+            if (data != null)
+            {
+                _myContext.Roles.Remove(data);
+                return _myContext.SaveChanges();
+            }
+            return FAIL;
         }
 
         public IEnumerable<Roles> GetAllRole()
         {
-            throw new NotImplementedException();
+            return _myContext.Roles.ToList();
         }
 
-        public Roles GetRoleById(string roleId)
-        {
-            throw new NotImplementedException();
-        }
 
         public int UpdateRole(Roles roles)
         {
-            throw new NotImplementedException();
+            var exists = _myContext.Roles.Any(r => r.roleId == roles.roleId);
+
+            if (exists)
+            {
+                _myContext.Entry(roles).State = EntityState.Modified;
+                return _myContext.SaveChanges();
+            }
+
+            return FAIL;
         }
     }
 }
