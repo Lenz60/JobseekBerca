@@ -8,5 +8,7 @@ namespace JobseekBerca.Context
         public MyContext(DbContextOptions<MyContext> options) : base(options) { }
         public DbSet<Users> Users { get; set; }
         public DbSet<Roles> Roles { get; set; }
+        public DbSet<Jobs> Jobs { get; set; }
+
     }
 }
