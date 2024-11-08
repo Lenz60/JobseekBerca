@@ -21,13 +21,13 @@ namespace JobseekBerca.Controllers
         {
             if (string.IsNullOrEmpty(roles.roleName))
             {
-                return ResponseHTTP.CreateResponse(400, "Role name is required.");
+                return ResponseHTTP.CreateResponse(400, "Role name is required!");
             }
             var addRole = _rolesRepository.AddRole(roles);
 
             if (addRole > 0)
             {
-                return ResponseHTTP.CreateResponse(200, "Success add new role.", roles);
+                return ResponseHTTP.CreateResponse(200, "Success add new role", roles);
             }
             else
             {

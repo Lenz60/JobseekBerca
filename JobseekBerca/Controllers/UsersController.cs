@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using JobseekBerca.ViewModels;
 using JobseekBerca.Helper;
+using JobseekBerca.Models;
 
 
 namespace JobseekBerca.Controllers
@@ -54,6 +55,32 @@ namespace JobseekBerca.Controllers
             else
             {
                 return ResponseHTTP.CreateResponse(400, "Fail to add new user.");
+            }
+        }
+
+        [HttpPut("changePassword")]
+        public IActionResult ChangePassword(UserVM.ChangePasswordVM changePasswordVM)
+        {
+            if (string.IsNullOrEmpty(changePasswordVM.OldPassword))
+            {
+                return ResponseHTTP.CreateResponse(400, "Old password is required!");
+            }else if (string.IsNullOrEmpty(changePasswordVM.NewPassword))
+            {
+                return ResponseHTTP.CreateResponse(400, "New password is required!");
+            }
+            var result = _usersRepository.ChangePassword(changePasswordVM);
+            if (result == 1)
+            {
+
+                return ResponseHTTP.CreateResponse(200, "Success change password.");
+            }
+            else if (result == -1)
+            {
+                return ResponseHTTP.CreateResponse(400, "Invalid old password.");
+            }
+            else
+            {
+                return ResponseHTTP.CreateResponse(404, "User Id  not found.");
             }
         }
     }

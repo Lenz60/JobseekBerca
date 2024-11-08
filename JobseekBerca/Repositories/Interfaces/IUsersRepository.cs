@@ -6,9 +6,8 @@ namespace JobseekBerca.Repositories.Interfaces
 {
     public interface IUsersRepository
     {
-        int UpdateUser(Users user);
-        int DeleteUser(string userId);
+        int ChangePassword(UserVM.ChangePasswordVM changePassword);
         int Register(UserVM.RegisterVM registervm);
-        int Login(UserVM.RegisterVM loginvm);
+        int Login(Users users);
     }
 }

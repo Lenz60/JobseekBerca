@@ -11,5 +11,11 @@ namespace JobseekBerca.ViewModels
             public string? email { get; set; }
             public string? password { get; set; }
         }
+        public class ChangePasswordVM
+        {
+            public string? userId { get; set; }
+            public string? OldPassword { get; set; }
+            public string? NewPassword { get; set; }
+        }
     }
 }

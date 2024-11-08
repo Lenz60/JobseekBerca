@@ -15,12 +15,11 @@ namespace JobseekBerca.Repositories
             _myContext = myContext;
         }
 
-        public int DeleteUser(string userId)
-        {
-            throw new NotImplementedException();
-        }
+        public const int FAIL = 0;
+        public const int SUCCESS = 1;
+        public const int INVALID_PASSWORD = -1;
 
-        public int Login(UserVM.RegisterVM loginvm)
+        public int DeleteUser(string userId)
         {
             throw new NotImplementedException();
         }
@@ -66,7 +65,26 @@ namespace JobseekBerca.Repositories
 
         }
 
-        public int UpdateUser(Users user)
+        public int ChangePassword(ChangePasswordVM changePassword)
+        {
+            var cekData = _myContext.Users
+           .FirstOrDefault(a => a.userId == changePassword.userId);
+
+            if (cekData == null)
+            {
+                return FAIL;
+            }
+            if (changePassword.OldPassword != cekData.password)
+            {
+                return INVALID_PASSWORD;
+            }
+
+            cekData.password = changePassword.NewPassword;
+            _myContext.Users.Update(cekData);
+            return _myContext.SaveChanges();
+        }
+
+        public int Login(Users users)
         {
             throw new NotImplementedException();
         }
