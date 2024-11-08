@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using JobseekBerca.ViewModels;
 using JobseekBerca.Helper;
 using JobseekBerca.Models;
+using static JobseekBerca.ViewModels.UserVM;
 
 
 namespace JobseekBerca.Controllers
@@ -58,6 +59,33 @@ namespace JobseekBerca.Controllers
             }
         }
 
+        [HttpPost("login")]
+        public IActionResult Login(UserVM.LoginVM login)
+        {
+            if (string.IsNullOrEmpty(login.email))
+            {
+                return ResponseHTTP.CreateResponse(400, "Email is required!");
+            }
+            else if (string.IsNullOrEmpty(login.password))
+            {
+                return ResponseHTTP.CreateResponse(400, "Password is required!");
+            }
+
+            var account = _usersRepository.Login(login);
+            if (account == 1)
+            {
+                return ResponseHTTP.CreateResponse(200, "Login successful", true);
+            }
+            else if (account == -1)
+            {
+                return ResponseHTTP.CreateResponse(400, "Invalid password");
+            }
+            else
+            {
+                return ResponseHTTP.CreateResponse(404, "Email not registered");
+            }
+        }
+
         [HttpPut("changePassword")]
         public IActionResult ChangePassword(UserVM.ChangePasswordVM changePasswordVM)
         {
@@ -68,6 +96,7 @@ namespace JobseekBerca.Controllers
             {
                 return ResponseHTTP.CreateResponse(400, "New password is required!");
             }
+
             var result = _usersRepository.ChangePassword(changePasswordVM);
             if (result == 1)
             {

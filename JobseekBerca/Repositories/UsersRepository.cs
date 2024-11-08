@@ -15,10 +15,10 @@ namespace JobseekBerca.Repositories
         {
             _myContext = myContext;
         }
-
+        public const int ACCOUNT_NOT_FOUND = -2;
+        public const int INVALID_PASSWORD = -1;
         public const int FAIL = 0;
         public const int SUCCESS = 1;
-        public const int INVALID_PASSWORD = -1;
 
         public int DeleteUser(string userId)
         {
@@ -86,9 +86,18 @@ namespace JobseekBerca.Repositories
             return _myContext.SaveChanges();
         }
 
-        public int Login(Users users)
+        public int Login(UserVM.LoginVM login)
         {
-            throw new NotImplementedException();
+            var data = _myContext.Users
+                .FirstOrDefault(a =>  a.email == login.email);
+
+            if (data == null)
+            {
+                return ACCOUNT_NOT_FOUND;
+            }
+            bool isValid = Hashing.ValidatePassword(login.password, data.password);
+            return isValid ? SUCCESS : INVALID_PASSWORD;
         }
+  
     }
 }

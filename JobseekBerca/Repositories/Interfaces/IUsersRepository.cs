@@ -8,6 +8,6 @@ namespace JobseekBerca.Repositories.Interfaces
     {
         int ChangePassword(UserVM.ChangePasswordVM changePassword);
         int Register(UserVM.RegisterVM registervm);
-        int Login(Users users);
+        int Login(UserVM.LoginVM login);
     }
 }
