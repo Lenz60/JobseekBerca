@@ -61,10 +61,10 @@ namespace JobseekBerca.Controllers
         [HttpPut("changePassword")]
         public IActionResult ChangePassword(UserVM.ChangePasswordVM changePasswordVM)
         {
-            if (string.IsNullOrEmpty(changePasswordVM.OldPassword))
+            if (string.IsNullOrEmpty(changePasswordVM.oldPassword))
             {
                 return ResponseHTTP.CreateResponse(400, "Old password is required!");
-            }else if (string.IsNullOrEmpty(changePasswordVM.NewPassword))
+            }else if (string.IsNullOrEmpty(changePasswordVM.newPassword))
             {
                 return ResponseHTTP.CreateResponse(400, "New password is required!");
             }

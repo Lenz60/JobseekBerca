@@ -4,6 +4,7 @@ using JobseekBerca.Repositories.Interfaces;
 using JobseekBerca.ViewModels;
 using JobseekBerca.Models;
 using static JobseekBerca.ViewModels.UserVM;
+using JobseekBerca.Helper;
 
 namespace JobseekBerca.Repositories
 {
@@ -45,12 +46,13 @@ namespace JobseekBerca.Repositories
         }
         public int Register(UserVM.RegisterVM registervm)
         {
+            string hashedPassword = Hashing.HashPassword(registervm.password);
             var newUser = new Users
             {
                 userId = GenerateIdUser(),
                 email = registervm.email,
                 roleId = "R02",
-                password = registervm.password,
+                password = hashedPassword,
             };
 
             var newProfile = new Profiles
@@ -74,12 +76,12 @@ namespace JobseekBerca.Repositories
             {
                 return FAIL;
             }
-            if (changePassword.OldPassword != cekData.password)
+            if (!Hashing.ValidatePassword(changePassword.oldPassword, cekData.password))
             {
                 return INVALID_PASSWORD;
             }
 
-            cekData.password = changePassword.NewPassword;
+            cekData.password = Hashing.HashPassword(changePassword.newPassword);
             _myContext.Users.Update(cekData);
             return _myContext.SaveChanges();
         }
