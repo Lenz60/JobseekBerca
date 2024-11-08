@@ -4,6 +4,7 @@ using JobseekBerca.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JobseekBerca.Migrations
 {
     [DbContext(typeof(MyContext))]
-    partial class MyContextModelSnapshot : ModelSnapshot
+    [Migration("20241108084405_add profile,experience,education,skill,certificate")]
+    partial class addprofileexperienceeducationskillcertificate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,29 +24,6 @@ namespace JobseekBerca.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("JobseekBerca.Models.Applications", b =>
-                {
-                    b.Property<string>("applicationId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("jobId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("status")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("userId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("applicationId");
-
-                    b.HasIndex("jobId");
-
-                    b.ToTable("Applications");
-                });
 
             modelBuilder.Entity("JobseekBerca.Models.Certificates", b =>
                 {
@@ -105,7 +85,7 @@ namespace JobseekBerca.Migrations
 
                     b.Property<string>("universityName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("userId")
                         .IsRequired()
@@ -127,6 +107,9 @@ namespace JobseekBerca.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("experienceId"));
 
                     b.Property<string>("company")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("endDate")
@@ -178,34 +161,6 @@ namespace JobseekBerca.Migrations
                     b.HasKey("userId");
 
                     b.ToTable("Profiles");
-                });
-
-            modelBuilder.Entity("JobseekBerca.Models.Jobs", b =>
-                {
-                    b.Property<string>("jobId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("location")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("salary")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("title")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("userId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("jobId");
-
-                    b.HasIndex("userId");
-
-                    b.ToTable("Jobs");
                 });
 
             modelBuilder.Entity("JobseekBerca.Models.Roles", b =>
@@ -266,18 +221,40 @@ namespace JobseekBerca.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("JobseekBerca.Models.Applications", b =>
+            modelBuilder.Entity("JobseekBerca.Models.Certificates", b =>
                 {
-                    b.HasOne("JobseekBerca.Models.Jobs", "Jobs")
+                    b.HasOne("JobseekBerca.Models.Profiles", "Profile")
                         .WithMany()
-                        .HasForeignKey("jobId")
+                        .HasForeignKey("userId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Jobs");
+                    b.Navigation("Profile");
                 });
 
-            modelBuilder.Entity("JobseekBerca.Models.Jobs", b =>
+            modelBuilder.Entity("JobseekBerca.Models.Educations", b =>
+                {
+                    b.HasOne("JobseekBerca.Models.Profiles", "Profile")
+                        .WithMany()
+                        .HasForeignKey("userId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Profile");
+                });
+
+            modelBuilder.Entity("JobseekBerca.Models.Experiences", b =>
+                {
+                    b.HasOne("JobseekBerca.Models.Profiles", "Profile")
+                        .WithMany()
+                        .HasForeignKey("userId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Profile");
+                });
+
+            modelBuilder.Entity("JobseekBerca.Models.Profiles", b =>
                 {
                     b.HasOne("JobseekBerca.Models.Users", "Users")
                         .WithMany()
@@ -286,6 +263,17 @@ namespace JobseekBerca.Migrations
                         .IsRequired();
 
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("JobseekBerca.Models.Skills", b =>
+                {
+                    b.HasOne("JobseekBerca.Models.Profiles", "Profile")
+                        .WithMany()
+                        .HasForeignKey("userId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Profile");
                 });
 
             modelBuilder.Entity("JobseekBerca.Models.Users", b =>

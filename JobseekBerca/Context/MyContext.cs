@@ -12,5 +12,10 @@ namespace JobseekBerca.Context
         public DbSet<Applications> Applications { get; set; }
 
 
+        public DbSet<Profiles> Profiles { get; set; }
+        public DbSet<Experiences> Experiences { get; set; }
+        public DbSet<Educations> Educations { get; set; }
+        public DbSet<Skills> Skills { get; set; }
+        public DbSet<Certificates> Certificates { get; set; }
     }
 }
