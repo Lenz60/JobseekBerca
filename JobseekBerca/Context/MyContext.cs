@@ -19,6 +19,7 @@ namespace JobseekBerca.Context
         public DbSet<Skills> Skills { get; set; }
         public DbSet<Certificates> Certificates { get; set; }
 
+        // Seed the Roles table with pre made roles data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
