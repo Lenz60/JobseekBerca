@@ -65,7 +65,11 @@ namespace JobseekBerca.Repositories
             var newProfile = new Profiles
             {
                 userId = newUser.userId,
-                fullName = $"{registervm.firstName} {registervm.lastName}"
+                fullName = $"{registervm.firstName} {registervm.lastName}",
+                summary = $"Hello my name is {registervm.firstName} {registervm.lastName} and I'm eager to learn",
+                gender = null,
+                address = null,
+                birthDate = null,
             };
 
             _myContext.Users.Add(newUser);
