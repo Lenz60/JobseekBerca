@@ -14,6 +14,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<MyContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("JobseekBerca")));
 builder.Services.AddScoped<UsersRepository>();
 builder.Services.AddScoped<RolesRepository>();
+builder.Services.AddScoped<JobsRepository>();
 
 
 
