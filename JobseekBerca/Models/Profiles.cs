@@ -12,13 +12,13 @@ namespace JobseekBerca.Models
     }
     public class Profiles
     {
-        [Key, ForeignKey("Users")]
+        [Key, ForeignKey("Users"), Required]
         public string userId { get; set; }
-        public string fullName { get; set; }
+        public string? fullName { get; set; }
         public string? summary { get; set; }
         public Gender? gender { get; set; }
         public string? address { get; set; }
-        public DateTime? birthdate { get; set; }
+        public DateTime? birthDate { get; set; }
         [JsonIgnore]
         public virtual Users? Users { get; set; }
 
