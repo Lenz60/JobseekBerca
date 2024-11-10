@@ -20,6 +20,7 @@ builder.Services.AddScoped<CertificatesRepository>();
 builder.Services.AddScoped<EducationsRepository>();
 builder.Services.AddScoped<ExperiencesRepository>();
 builder.Services.AddScoped<SkillsRepository>();
+builder.Services.AddScoped<ApplicationsRepository>();
 
 
 
