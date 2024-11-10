@@ -39,6 +39,10 @@ namespace JobseekBerca.Repositories
             }
             return newUserId;
         }
+        public string GenerateUlidUser()
+        {
+            return Ulid.NewUlid().ToString();
+        }
         public bool CheckEmail(string email)
         {
             return _myContext.Users.Any(e => e.email == email);
@@ -49,7 +53,10 @@ namespace JobseekBerca.Repositories
             string hashedPassword = Hashing.HashPassword(registervm.password);
             var newUser = new Users
             {
-                userId = GenerateIdUser(),
+                // Generate userId with UID increment based on last created
+                // userId = GenerateIdUser(),
+                // Generate userId with ULID
+                userId = GenerateUlidUser(),
                 email = registervm.email,
                 roleId = "R02",
                 password = hashedPassword,
