@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using JobseekBerca.Models;
+using System.Data;
 
 namespace JobseekBerca.Context
 {
@@ -17,5 +18,16 @@ namespace JobseekBerca.Context
         public DbSet<Educations> Educations { get; set; }
         public DbSet<Skills> Skills { get; set; }
         public DbSet<Certificates> Certificates { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Roles>().HasData(
+                new Roles { roleId = "R01", roleName = "Super Admin" },
+                new Roles { roleId = "R02", roleName = "Admin" },
+                new Roles { roleId = "R03", roleName = "User" }
+            );
+        }
     }
 }
