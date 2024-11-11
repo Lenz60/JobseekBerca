@@ -5,6 +5,7 @@ using JobseekBerca.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
+using static JobseekBerca.ViewModels.DetailsVM;
 
 namespace JobseekBerca.Controllers
 {
@@ -26,40 +27,20 @@ namespace JobseekBerca.Controllers
 
             if (data == null)
             {
-                return ResponseHTTP.CreateResponse(200, "No data Roles.");
+                return ResponseHTTP.CreateResponse(200, "No job found.");
             }
             else
             {
-                return ResponseHTTP.CreateResponse(200, "Roles retrieved successfully.", data);
+                return ResponseHTTP.CreateResponse(200, "Jobs fetched.", data);
             }
         }
 
         [HttpPost]
         public IActionResult AddJobs(Jobs jobs)
         {
-            if (string.IsNullOrEmpty(jobs.title))
+            if (Whitespace.HasNullOrEmptyStringProperties(jobs, out string propertyName))
             {
-                return ResponseHTTP.CreateResponse(400, "Title is required!");
-            }
-            if (string.IsNullOrEmpty(jobs.description))
-            {
-                return ResponseHTTP.CreateResponse(400, "Description is required!");
-            }
-            if (string.IsNullOrEmpty(jobs.salary))
-            {
-                return ResponseHTTP.CreateResponse(400, "Salary is required!");
-            }
-            if (string.IsNullOrEmpty(jobs.location))
-            {
-                return ResponseHTTP.CreateResponse(400, "Location is required!");
-            }
-            if (string.IsNullOrWhiteSpace(jobs.userId))
-            {
-                return StatusCode(200, new
-                {
-                    StatusCode = 200,
-                    Message = $"User Id is Required"
-                });
+                return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
             var addJob = _jobsRepository.AddJobs(jobs);
 
@@ -84,15 +65,12 @@ namespace JobseekBerca.Controllers
             return ResponseHTTP.CreateResponse(404, "No job found with the sepecific id.");
         }
 
-        [HttpPut("{jobId}")]
-        public IActionResult UpdateJobs(string jobId, [FromBody] Jobs jobs)
+        [HttpPut]
+        public IActionResult UpdateJobs([FromBody] Jobs jobs)
         {
-            if (string.IsNullOrEmpty(jobs.jobId))
+            if (Whitespace.HasNullOrEmptyStringProperties(jobs, out string propertyName))
             {
-                return ResponseHTTP.CreateResponse(400, "JobID is required!");
-            }else if (string.IsNullOrEmpty(jobs.title))
-            {
-                return ResponseHTTP.CreateResponse(400, "Title is required!");
+                return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
             int data = _jobsRepository.UpdateJobs(jobs);
 
