@@ -9,5 +9,7 @@ namespace JobseekBerca.Repositories.Interfaces
         int ChangePassword(UserVM.ChangePasswordVM changePassword);
         int Register(UserVM.RegisterVM registervm);
         int Login(UserVM.LoginVM login);
+        PayloadVM.GenerateVM GetCredsByEmail(string email);
+        string GenerateToken(PayloadVM.GenerateVM payload);
     }
 }

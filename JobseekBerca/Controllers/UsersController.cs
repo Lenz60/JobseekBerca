@@ -58,7 +58,16 @@ namespace JobseekBerca.Controllers
             var account = _usersRepository.Login(login);
             if (account == 1)
             {
-                return ResponseHTTP.CreateResponse(200, "Login successful", true);
+                var creds = _usersRepository.GetCredsByEmail(login.email);
+                if (creds != null)
+                {
+                    var token = _usersRepository.GenerateToken(creds);
+                    if (token != null)
+                    {
+                        return ResponseHTTP.CreateResponse(200, "Login successful", token);
+                    }
+                }
+                return ResponseHTTP.CreateResponse(400, "Invalid email");
             }
             else if (account == -1)
             {
@@ -68,30 +77,30 @@ namespace JobseekBerca.Controllers
             {
                 return ResponseHTTP.CreateResponse(404, "Email not registered");
             }
-        }
-
-        [HttpPut("changePassword")]
-        public IActionResult ChangePassword(UserVM.ChangePasswordVM changePasswordVM)
-        {
-            if (Whitespace.HasNullOrEmptyStringProperties(changePasswordVM, out string propertyName))
-            {
-                return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
 
-            var result = _usersRepository.ChangePassword(changePasswordVM);
-            if (result == 1)
+            [HttpPut("changePassword")]
+            public IActionResult ChangePassword(UserVM.ChangePasswordVM changePasswordVM)
             {
+                if (Whitespace.HasNullOrEmptyStringProperties(changePasswordVM, out string propertyName))
+                {
+                    return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
+                }
 
-                return ResponseHTTP.CreateResponse(200, "Success change password.");
-            }
-            else if (result == -1)
-            {
-                return ResponseHTTP.CreateResponse(400, "Invalid old password.");
-            }
-            else
-            {
-                return ResponseHTTP.CreateResponse(404, "User Id  not found.");
+                var result = _usersRepository.ChangePassword(changePasswordVM);
+                if (result == 1)
+                {
+
+                    return ResponseHTTP.CreateResponse(200, "Success change password.");
+                }
+                else if (result == -1)
+                {
+                    return ResponseHTTP.CreateResponse(400, "Invalid old password.");
+                }
+                else
+                {
+                    return ResponseHTTP.CreateResponse(404, "User Id  not found.");
+                }
             }
         }
     }
-}

@@ -11,9 +11,11 @@ namespace JobseekBerca.Repositories
     public class UsersRepository : IUsersRepository
     {
         private readonly MyContext _myContext;
-        public UsersRepository(MyContext myContext)
+        private readonly IConfiguration _config;
+        public UsersRepository(MyContext myContext, IConfiguration config)
         {
             _myContext = myContext;
+            _config = config;
         }
         public const int ACCOUNT_NOT_FOUND = -2;
         public const int INVALID_PASSWORD = -1;
@@ -39,10 +41,6 @@ namespace JobseekBerca.Repositories
             }
             return newUserId;
         }
-        public string GenerateUlidUser()
-        {
-            return Ulid.NewUlid().ToString();
-        }
         public bool CheckEmail(string email)
         {
             return _myContext.Users.Any(e => e.email == email);
@@ -50,13 +48,13 @@ namespace JobseekBerca.Repositories
         }
         public int Register(UserVM.RegisterVM registervm)
         {
-            string hashedPassword = Hashing.HashPassword(registervm.password);
+            string hashedPassword = HashingHelper.HashPassword(registervm.password);
             var newUser = new Users
             {
                 // Generate userId with UID increment based on last created
                 // userId = GenerateIdUser(),
                 // Generate userId with ULID
-                userId = GenerateUlidUser(),
+                userId = ULIDHelper.GenerateULID(),
                 email = registervm.email,
                 roleId = "R02",
                 password = hashedPassword,
@@ -87,12 +85,12 @@ namespace JobseekBerca.Repositories
             {
                 return FAIL;
             }
-            if (!Hashing.ValidatePassword(changePassword.oldPassword, cekData.password))
+            if (!HashingHelper.ValidatePassword(changePassword.oldPassword, cekData.password))
             {
                 return INVALID_PASSWORD;
             }
 
-            cekData.password = Hashing.HashPassword(changePassword.newPassword);
+            cekData.password = HashingHelper.HashPassword(changePassword.newPassword);
             _myContext.Users.Update(cekData);
             return _myContext.SaveChanges();
         }
@@ -106,9 +104,41 @@ namespace JobseekBerca.Repositories
             {
                 return ACCOUNT_NOT_FOUND;
             }
-            bool isValid = Hashing.ValidatePassword(login.password, data.password);
+            bool isValid = HashingHelper.ValidatePassword(login.password, data.password);
             return isValid ? SUCCESS : INVALID_PASSWORD;
         }
-  
+        public int CheckUserId(string userId)
+        {
+            //throw new NotImplementedException();
+            var check = _myContext.Users.Find(userId);
+            if (check == null)
+            {
+                return FAIL;
+            }
+            return SUCCESS;
+        }
+
+        
+
+        public PayloadVM.GenerateVM GetCredsByEmail(string email)
+        {
+            var check = CheckEmail(email);
+            if (!check)
+            {
+                return null;
+            }
+            var payload = _myContext.Users.Select(u => new PayloadVM.GenerateVM
+            {
+                userId = u.userId,
+                roleId = u.roleId,
+                email = u.email
+            }).FirstOrDefault(u => u.email == email);
+            return payload;
+        }
+
+        public string GenerateToken(PayloadVM.GenerateVM payload)
+        {
+            return JWTHelper.GenerateToken(payload, _config);
+        }
     }
 }
