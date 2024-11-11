@@ -18,6 +18,8 @@ namespace JobseekBerca.Context
         public DbSet<Educations> Educations { get; set; }
         public DbSet<Skills> Skills { get; set; }
         public DbSet<Certificates> Certificates { get; set; }
+        public DbSet<SocialMedias> SocialMedias { get; set; }
+        public DbSet<SavedJobs> SavedJobs { get; set; }
 
         // Seed the Roles table with pre made roles data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -29,6 +31,17 @@ namespace JobseekBerca.Context
                 new Roles { roleId = "R02", roleName = "Admin" },
                 new Roles { roleId = "R03", roleName = "User" }
             );
+            modelBuilder.Entity<SavedJobs>()
+            .HasOne(sj => sj.Job)
+            .WithMany()
+            .HasForeignKey(sj => sj.jobId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<SavedJobs>()
+                .HasOne(sj => sj.User)
+                .WithMany()
+                .HasForeignKey(sj => sj.userId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }
