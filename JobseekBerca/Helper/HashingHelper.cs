@@ -1,6 +1,6 @@
 ﻿namespace JobseekBerca.Helper
 {
-    public class Hashing
+    public class HashingHelper
     {
         private static string GetRandomSalt()
         {
