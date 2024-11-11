@@ -1,6 +1,7 @@
 
 using JobseekBerca.Context;
 using JobseekBerca.Repositories;
+using JobseekBerca.Repositories.Details_Repository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +22,8 @@ builder.Services.AddScoped<EducationsRepository>();
 builder.Services.AddScoped<ExperiencesRepository>();
 builder.Services.AddScoped<SkillsRepository>();
 builder.Services.AddScoped<ApplicationsRepository>();
+builder.Services.AddScoped<SocialMediaRepository>();
+builder.Services.AddScoped<SavedJobsRepository>();
 
 
 
