@@ -56,7 +56,7 @@ namespace JobseekBerca.Repositories
                 // Generate userId with ULID
                 userId = ULIDHelper.GenerateULID(),
                 email = registervm.email,
-                roleId = "R02",
+                roleId = "R03",
                 password = hashedPassword,
             };
 
