@@ -20,7 +20,7 @@ namespace JobseekBerca.Repositories
 
         public int CheckUserId(string userId)
         {
-            var check = _myContext.Profiles.Find(userId);
+            var check = _myContext.Users.Find(userId);
             if (check == null)
             {
                 return FAIL;
