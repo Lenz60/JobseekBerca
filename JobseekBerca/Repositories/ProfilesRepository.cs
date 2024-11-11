@@ -55,6 +55,7 @@ namespace JobseekBerca.Repositories
                     summary = create.summary,
                     gender = create.gender,
                     address = create.address,
+                    phoneNumber = create.address,
                     birthDate = create.birthDate
                 };
 
