@@ -25,22 +25,10 @@ namespace JobseekBerca.Controllers
         [HttpPost]
         public IActionResult Register(UserVM.RegisterVM registerVM)
         {
-            if (string.IsNullOrWhiteSpace(registerVM.firstName))
+            if (Whitespace.HasNullOrEmptyStringProperties(registerVM, out string propertyName))
             {
-                return ResponseHTTP.CreateResponse(400, "First Name is required!");
+                return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
-            else if (string.IsNullOrWhiteSpace(registerVM.lastName))
-            {
-                return ResponseHTTP.CreateResponse(400, "Last Name is required!");
-            }
-            else if (string.IsNullOrWhiteSpace(registerVM.email)){
-
-                return ResponseHTTP.CreateResponse(400, "Email is required!");
-            }
-            else if (string.IsNullOrWhiteSpace(registerVM.password)){
-                return ResponseHTTP.CreateResponse(400, "Password Name is required!");
-            }
-
             var checkEmail = _usersRepository.CheckEmail(registerVM.email);
 
             if (checkEmail)
@@ -62,13 +50,9 @@ namespace JobseekBerca.Controllers
         [HttpPost("login")]
         public IActionResult Login(UserVM.LoginVM login)
         {
-            if (string.IsNullOrEmpty(login.email))
+            if (Whitespace.HasNullOrEmptyStringProperties(login, out string propertyName))
             {
-                return ResponseHTTP.CreateResponse(400, "Email is required!");
-            }
-            else if (string.IsNullOrEmpty(login.password))
-            {
-                return ResponseHTTP.CreateResponse(400, "Password is required!");
+                return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
 
             var account = _usersRepository.Login(login);
@@ -89,12 +73,9 @@ namespace JobseekBerca.Controllers
         [HttpPut("changePassword")]
         public IActionResult ChangePassword(UserVM.ChangePasswordVM changePasswordVM)
         {
-            if (string.IsNullOrEmpty(changePasswordVM.oldPassword))
+            if (Whitespace.HasNullOrEmptyStringProperties(changePasswordVM, out string propertyName))
             {
-                return ResponseHTTP.CreateResponse(400, "Old password is required!");
-            }else if (string.IsNullOrEmpty(changePasswordVM.newPassword))
-            {
-                return ResponseHTTP.CreateResponse(400, "New password is required!");
+                return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
 
             var result = _usersRepository.ChangePassword(changePasswordVM);

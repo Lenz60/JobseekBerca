@@ -67,12 +67,9 @@ namespace JobseekBerca.Controllers
         [HttpPut]
         public IActionResult UpdateRole([FromBody] Roles roles)
         {
-            if (string.IsNullOrEmpty(roles.roleId))
+            if (Whitespace.HasNullOrEmptyStringProperties(roles, out string propertyName))
             {
-                return ResponseHTTP.CreateResponse(400, "RoleID is required!");
-            }else if (string.IsNullOrEmpty(roles.roleName))
-            {
-                return ResponseHTTP.CreateResponse(400, "RoleName is required!");
+                return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
             int data = _rolesRepository.UpdateRole(roles);
 
