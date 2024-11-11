@@ -58,6 +58,27 @@ namespace JobseekBerca.Controllers
             return ResponseHTTP.CreateResponse(404, "User is not found");
         }
 
+        [HttpPut("Experiences")]
+        public IActionResult UpdateExperiences(Experiences experiences)
+        {
+            if (Whitespace.HasNullOrEmptyStringProperties(experiences, out string propertyName))
+            {
+                return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
+            }
+            var check = _experiencesRepository.GetExperienceById(experiences.userId);
+            if (check != null)
+            {
+                var updateExperiences = _experiencesRepository.UpdateExperience(experiences);
+                if (updateExperiences > 0)
+                {
+                    return ResponseHTTP.CreateResponse(200, "Experiences info is updated!", experiences);
+                }
+                return ResponseHTTP.CreateResponse(400, "Fail to update experiences info!");
+            }
+            return ResponseHTTP.CreateResponse(404, "Experiences info is not found!");
+        }
+
+        
 
         [HttpDelete("Experiences")]
         public IActionResult DeleteExperiences(DetailsVM.DeleteVM deleteVM)
@@ -114,6 +135,26 @@ namespace JobseekBerca.Controllers
             return ResponseHTTP.CreateResponse(404, "User info is not found");
         }
 
+        [HttpPut("Educations")]
+        public IActionResult UpdateEducations(Educations educations)
+        {
+            if (Whitespace.HasNullOrEmptyStringProperties(educations, out string propertyName))
+            {
+                return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
+            }
+            var check = _educationsRepository.GetEducationById(educations.userId);
+            if (check != null)
+            {
+                var updateEducations = _educationsRepository.UpdateEducation(educations);
+                if (updateEducations > 0)
+                {
+                    return ResponseHTTP.CreateResponse(200, "Educations info is updated!", educations);
+                }
+                return ResponseHTTP.CreateResponse(400, "Fail to update educations info!");
+            }
+            return ResponseHTTP.CreateResponse(404, "Educations info is not found!");
+        }
+
         [HttpDelete("Educations")]
         public IActionResult DeleteEducations(DetailsVM.DeleteVM deleteVM)
         {
@@ -163,6 +204,26 @@ namespace JobseekBerca.Controllers
                 return ResponseHTTP.CreateResponse(400, "Fail to update skills info!");
             }
             return ResponseHTTP.CreateResponse(404, "User info is not found");
+        }
+
+        [HttpPut("Skills")]
+        public IActionResult UpdateSkills(Skills skills)
+        {
+            if (Whitespace.HasNullOrEmptyStringProperties(skills, out string propertyName))
+            {
+                return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
+            }
+            var check = _skillsRepository.GetSkillById(skills.userId);
+            if (check != null)
+            {
+                var updateSkills = _skillsRepository.UpdateSkill(skills);
+                if (updateSkills > 0)
+                {
+                    return ResponseHTTP.CreateResponse(200, "Skills info is updated!", skills);
+                }
+                return ResponseHTTP.CreateResponse(400, "Fail to update skills info!");
+            }
+            return ResponseHTTP.CreateResponse(404, "Skills info is not found!");
         }
 
         [HttpDelete("Skills")]
@@ -215,6 +276,26 @@ namespace JobseekBerca.Controllers
                 return ResponseHTTP.CreateResponse(400, "Fail to update certificate info!");
             }
             return ResponseHTTP.CreateResponse(404, "User info is not found");
+        }
+
+        [HttpPut("Certificates")]
+        public IActionResult UpdateCertificates(Certificates certificates)
+        {
+            if (Whitespace.HasNullOrEmptyStringProperties(certificates, out string propertyName))
+            {
+                return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
+            }
+            var check = _certificateRepository.GetCertificateById(certificates.userId);
+            if (check != null)
+            {
+                var updateCertificates = _certificateRepository.UpdateCertificate(certificates);
+                if (updateCertificates > 0)
+                {
+                    return ResponseHTTP.CreateResponse(200, "Certificates info is updated!", certificates);
+                }
+                return ResponseHTTP.CreateResponse(400, "Fail to update certificates info!");
+            }
+            return ResponseHTTP.CreateResponse(404, "Certificates info is not found!");
         }
 
         [HttpDelete("Certificates")]
