@@ -8,8 +8,8 @@ namespace JobseekBerca.Models
     {
         [Key]
         public int socialMediaId { get; set; }
-        public string socialMediaName { get; set; }
-        public string socialMediaLink { get; set; }
+        public string name { get; set; }
+        public string link { get; set; }
         [JsonIgnore]
         public virtual Profiles? Profile { get; set; }
         [ForeignKey("Profile"), Required]
