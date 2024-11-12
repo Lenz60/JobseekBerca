@@ -13,7 +13,7 @@ namespace JobseekBerca.Models
         public string? description { get; set; }
         public string? jobTypes { get; set; }
         public DateTime startDate { get; set; }
-        public DateTime endDate { get; set; }
+        public DateTime? endDate { get; set; }
         [JsonIgnore]
         public virtual Profiles? Profile { get; set; }
         [ForeignKey("Profile"), Required]
