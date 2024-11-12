@@ -42,6 +42,24 @@ namespace JobseekBerca.Controllers
             }
         }
 
+        [HttpGet("Detail")]
+        public IActionResult GetJobs(string jobId)
+        {
+            try
+            {
+                var job = _jobsRepository.GetJobById(jobId);
+                return ResponseHTTP.CreateResponse(200, "Jobs fetched.", job);
+            }
+            catch(HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch(Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
+            }
+        }
+
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public IActionResult AddJobs(Jobs jobs)

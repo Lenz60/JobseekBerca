@@ -29,12 +29,19 @@ namespace JobseekBerca.Repositories
 
         public Jobs GetJobById(string jobId)
         {
-            var selectedJob = _myContext.Jobs.Find(jobId);
-            if (selectedJob != null)
+            try
             {
-                return selectedJob;
+                var selectedJob = _myContext.Jobs.Find(jobId);
+                return selectedJob == null ? throw new HttpResponseExceptionHelper(404, "Job not found") : selectedJob;
             }
-            return null;
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
+            }
         }
 
         public int AddJobs(Jobs jobs)
@@ -131,7 +138,7 @@ namespace JobseekBerca.Repositories
                     //return FAIL;
                     throw new HttpResponseExceptionHelper(404, "Invalid job id");
                 }
-                throw new HttpResponseExceptionHelper(403, "Unauthorized access");                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+                throw new HttpResponseExceptionHelper(403, "Unauthorized access");
             }
             catch (HttpResponseExceptionHelper e)
             {
