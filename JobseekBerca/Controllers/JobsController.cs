@@ -2,6 +2,8 @@ using JobseekBerca.Helper;
 using JobseekBerca.Models;
 using JobseekBerca.Repositories;
 using JobseekBerca.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
@@ -11,6 +13,7 @@ namespace JobseekBerca.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("AllowSpecificOrigin")]
     public class JobsController : ControllerBase
     {
         private JobsRepository _jobsRepository;
@@ -23,48 +26,68 @@ namespace JobseekBerca.Controllers
         [HttpGet]
         public IActionResult GetAllJobs()
         {
-            var data = _jobsRepository.GetAllJobs();
-
-            if (data == null)
+            try
             {
-                return ResponseHTTP.CreateResponse(200, "No job found.");
-            }
-            else
-            {
+                var data = _jobsRepository.GetAllJobs();
                 return ResponseHTTP.CreateResponse(200, "Jobs fetched.", data);
+
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public IActionResult AddJobs(Jobs jobs)
         {
-            if (Whitespace.HasNullOrEmptyStringProperties(jobs, out string propertyName))
+            var nullableFields = new HashSet<string> { "jobId" };
+            if (Whitespace.HasNullOrEmptyStringProperties(jobs, out string propertyName, nullableFields))
             {
                 return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
-            var addJob = _jobsRepository.AddJobs(jobs);
-
-            if (addJob > 0)
+            try
             {
+                _jobsRepository.AddJobs(jobs);
                 return ResponseHTTP.CreateResponse(200, "Success add new jobs", jobs);
+
             }
-            else
+            catch (HttpResponseExceptionHelper e)
             {
-                return ResponseHTTP.CreateResponse(404, "Job Failed added");
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
             }
         }
 
-        [HttpDelete("{jobId}")]
-        public IActionResult DeleteJobs(string userId,string jobId)
+        [Authorize(Roles = "Admin")]
+        [HttpDelete]
+        public IActionResult DeleteJobs(string userId, string jobId)
         {
-            int result = _jobsRepository.DeleteJobs(userId,jobId);
-            if (result > 0)
+            try
             {
+                _jobsRepository.DeleteJobs(userId, jobId);
                 return ResponseHTTP.CreateResponse(200, "Success deleted job.");
+
             }
-            return ResponseHTTP.CreateResponse(404, "No job found with the sepecific id.");
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
+            }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         public IActionResult UpdateJobs([FromBody] Jobs jobs)
         {
@@ -72,13 +95,20 @@ namespace JobseekBerca.Controllers
             {
                 return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
-            int data = _jobsRepository.UpdateJobs(jobs);
-
-            if (data > 0)
+            try
             {
+                _jobsRepository.UpdateJobs(jobs);
                 return ResponseHTTP.CreateResponse(200, "Job successfully updated.", jobs);
+
             }
-            return ResponseHTTP.CreateResponse(404, "No jobs found with the sepecific id.");
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
+            }
         }
     }
 }
