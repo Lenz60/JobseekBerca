@@ -6,6 +6,7 @@ using JobseekBerca.ViewModels;
 using JobseekBerca.Helper;
 using JobseekBerca.Models;
 using static JobseekBerca.ViewModels.UserVM;
+using Microsoft.AspNetCore.Cors;
 
 
 namespace JobseekBerca.Controllers
@@ -56,52 +57,45 @@ namespace JobseekBerca.Controllers
                 return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
 
-            var account = _usersRepository.Login(login);
-            if (account == 1)
+            try
             {
+                var account = _usersRepository.Login(login);
                 var creds = _usersRepository.GetCredsByEmail(login.email);
-                if (creds != null)
-                {
-                    var token = _usersRepository.GenerateToken(creds);
-                    if (token != null)
-                    {
-                        return ResponseHTTP.CreateResponse(200, "Login successful", token);
-                    }
-                }
-                return ResponseHTTP.CreateResponse(400, "Invalid email");
-            }
-            else if (account == -1)
-            {
-                return ResponseHTTP.CreateResponse(400, "Invalid password");
-            }
-            else
-            {
-                return ResponseHTTP.CreateResponse(404, "Email not registered");
-            }
-            }
+                var token = _usersRepository.GenerateToken(creds);
+                return ResponseHTTP.CreateResponse(200, "Login successful", token);
 
-            [HttpPut("changePassword")]
-            public IActionResult ChangePassword(UserVM.ChangePasswordVM changePasswordVM)
+            }
+            catch (HttpResponseExceptionHelper e)
             {
-                if (Whitespace.HasNullOrEmptyStringProperties(changePasswordVM, out string propertyName))
-                {
-                    return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
-                }
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
+            }
+        }
 
+        [HttpPut("changePassword")]
+        public IActionResult ChangePassword(UserVM.ChangePasswordVM changePasswordVM)
+        {
+            if (Whitespace.HasNullOrEmptyStringProperties(changePasswordVM, out string propertyName))
+            {
+                return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
+            }
+            try
+            {
                 var result = _usersRepository.ChangePassword(changePasswordVM);
-                if (result == 1)
-                {
+                return ResponseHTTP.CreateResponse(200, "Password changed.");
 
-                    return ResponseHTTP.CreateResponse(200, "Success change password.");
-                }
-                else if (result == -1)
-                {
-                    return ResponseHTTP.CreateResponse(400, "Invalid old password.");
-                }
-                else
-                {
-                    return ResponseHTTP.CreateResponse(404, "User Id  not found.");
-                }
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
             }
         }
     }
+}

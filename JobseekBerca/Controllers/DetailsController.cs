@@ -1,9 +1,11 @@
 ﻿using JobseekBerca.Helper;
 using JobseekBerca.Models;
 using JobseekBerca.Repositories;
+using JobseekBerca.Repositories.Details_Repository;
 using JobseekBerca.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using static JobseekBerca.ViewModels.DetailsVM;
 
 namespace JobseekBerca.Controllers
 {
@@ -15,70 +17,95 @@ namespace JobseekBerca.Controllers
         public readonly EducationsRepository _educationsRepository;
         public readonly ExperiencesRepository _experiencesRepository;
         public readonly SkillsRepository _skillsRepository;
+        public readonly SocialMediaRepository _socialMediaRepository;
 
-        public DetailsController(CertificatesRepository certificateRepository, 
-            EducationsRepository educationsRepository, 
-            ExperiencesRepository experiencesRepository, 
-            SkillsRepository skillsRepository)
+        public DetailsController(CertificatesRepository certificateRepository,
+            EducationsRepository educationsRepository,
+            ExperiencesRepository experiencesRepository,
+            SkillsRepository skillsRepository,
+            SocialMediaRepository socialMediaRepository)
         {
             _certificateRepository = certificateRepository;
             _educationsRepository = educationsRepository;
             _experiencesRepository = experiencesRepository;
             _skillsRepository = skillsRepository;
+            _socialMediaRepository = socialMediaRepository;
         }
 
         [HttpGet("Experiences")]
         public IActionResult GetExperiences(string userId)
         {
-            var check = _experiencesRepository.GetExperienceById(userId);
-            if (check != null)
+            try
             {
-                return ResponseHTTP.CreateResponse(200, "Experiences info fetched!", check);
+                var experience = _experiencesRepository.GetExperienceById(userId);
+                return ResponseHTTP.CreateResponse(200, "Experiences info fetched!", experience);
             }
-            return ResponseHTTP.CreateResponse(404, "Experiences info is not found!");
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
+            }
+            //if (check != null)
+            //{
+            //}
+            //return ResponseHTTP.CreateResponse(404, "Experiences info is not found!");
         }
 
         [HttpPost("Experiences")]
         public IActionResult CreateExperiences(Experiences experiences)
         {
-            if (Whitespace.HasNullOrEmptyStringProperties(experiences, out string propertyName))
+            var nullableFields = new HashSet<string> { "endDate", "description" };
+            if (Whitespace.HasNullOrEmptyStringProperties(experiences, out string propertyName, nullableFields))
             {
                 return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
-            var check = _experiencesRepository.CheckUserId(experiences.userId);
-            if (check > 0 )
+            try
             {
                 var updateExperiences = _experiencesRepository.CreateExperience(experiences);
-                if (updateExperiences > 0)
-                {
-                    return ResponseHTTP.CreateResponse(200, "Experiences info is updated!", experiences);
-                }
-                return ResponseHTTP.CreateResponse(400, "Fail to update experiences info!");
+                return ResponseHTTP.CreateResponse(200, "Experiences info is updated!", experiences);
+
             }
-            return ResponseHTTP.CreateResponse(404, "User is not found");
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
+            }
+            //var check = _experiencesRepository.CheckUserId(experiences.userId);
+            //if (check > 0)
+            //{
+            //}
+            //return ResponseHTTP.CreateResponse(404, "User is not found");
         }
 
         [HttpPut("Experiences")]
         public IActionResult UpdateExperiences(Experiences experiences)
         {
-            if (Whitespace.HasNullOrEmptyStringProperties(experiences, out string propertyName))
+            var nullableFields = new HashSet<string> { "endDate", "description" };
+            if (Whitespace.HasNullOrEmptyStringProperties(experiences, out string propertyName, nullableFields))
             {
                 return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
-            var check = _experiencesRepository.GetExperienceById(experiences.userId);
-            if (check != null)
+            try
             {
                 var updateExperiences = _experiencesRepository.UpdateExperience(experiences);
-                if (updateExperiences > 0)
-                {
-                    return ResponseHTTP.CreateResponse(200, "Experiences info is updated!", experiences);
-                }
-                return ResponseHTTP.CreateResponse(400, "Fail to update experiences info!");
+                return ResponseHTTP.CreateResponse(200, "Experiences info is updated!", experiences);
             }
-            return ResponseHTTP.CreateResponse(404, "Experiences info is not found!");
-        }
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
+            }
 
-        
+        }
 
         [HttpDelete("Experiences")]
         public IActionResult DeleteExperiences(DetailsVM.DeleteVM deleteVM)
@@ -107,52 +134,84 @@ namespace JobseekBerca.Controllers
             {
                 return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
-            var educations = _educationsRepository.GetEducationById(userId);
-            if (educations != null)
+            try
             {
+                var educations = _educationsRepository.GetEducationById(userId);
                 return ResponseHTTP.CreateResponse(200, "Educations info fetched!", educations);
+
             }
-            return ResponseHTTP.CreateResponse(404, "Educations info is not found!");
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
+            }
+
         }
 
         [HttpPost("Educations")]
         public IActionResult CreateEducations(Educations educations)
         {
-            if (Whitespace.HasNullOrEmptyStringProperties(educations, out string propertyName))
+            var nullableFields = new HashSet<string> { "description", "endDate" };
+            if (Whitespace.HasNullOrEmptyStringProperties(educations, out string propertyName, nullableFields))
             {
                 return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
-            var check = _educationsRepository.CheckUserId(educations.userId);
-            if (check > 0)
+            try
             {
                 var updateEducations = _educationsRepository.CreateEducation(educations);
-                if (updateEducations > 0)
-                {
-                    return ResponseHTTP.CreateResponse(200, "Educations info is updated!", educations);
-                }
-                return ResponseHTTP.CreateResponse(400, "Fail to update educations info!");
+                return ResponseHTTP.CreateResponse(200, "Educations info is updated!", educations);
+
             }
-            return ResponseHTTP.CreateResponse(404, "User info is not found");
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
+
+            }
+            //if (check > 0)s
         }
 
         [HttpPut("Educations")]
         public IActionResult UpdateEducations(Educations educations)
         {
+
+            var nullableFields = new HashSet<string> { "description", "endDate" };
             if (Whitespace.HasNullOrEmptyStringProperties(educations, out string propertyName))
             {
                 return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
-            var check = _educationsRepository.GetEducationById(educations.userId);
-            if (check != null)
+            try
             {
-                var updateEducations = _educationsRepository.UpdateEducation(educations);
-                if (updateEducations > 0)
-                {
-                    return ResponseHTTP.CreateResponse(200, "Educations info is updated!", educations);
-                }
-                return ResponseHTTP.CreateResponse(400, "Fail to update educations info!");
+                //var check = _educationsRepository.GetEducationById(educations.userId);
+                _educationsRepository.UpdateEducation(educations);
+                return ResponseHTTP.CreateResponse(200, "Educations info is updated!", educations);
+
             }
-            return ResponseHTTP.CreateResponse(404, "Educations info is not found!");
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
+
+            }
+            //if (check != null)
+            //{
+            //    if (updateEducations > 0)
+            //    {
+            //    }
+            //}
+            //return ResponseHTTP.CreateResponse(404, "Educations info is not found!");
         }
 
         [HttpDelete("Educations")]
@@ -162,28 +221,54 @@ namespace JobseekBerca.Controllers
             {
                 return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
-            var check = _educationsRepository.GetEducationById(deleteVM.userId);
-            if (check != null)
+            try
             {
-                var deleteEducations = _educationsRepository.DeleteEducation(deleteVM);
-                if (deleteEducations > 0)
-                {
-                    return ResponseHTTP.CreateResponse(200, "Educations info is deleted!");
-                }
-                return ResponseHTTP.CreateResponse(400, "Fail to delete educations info!");
+                //var check = _educationsRepository.GetEducationById(deleteVM.userId);
+                _educationsRepository.DeleteEducation(deleteVM);
+                return ResponseHTTP.CreateResponse(200, "Educations info is deleted!");
+
             }
-            return ResponseHTTP.CreateResponse(404, "Educations info is not found!");
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
+
+            }
+            //if (check != null)
+            //{
+            //    if (deleteEducations > 0)
+            //    {
+            //    }
+            //}
+            //return ResponseHTTP.CreateResponse(404, "Educations info is not found!");
         }
 
         [HttpGet("Skills")]
         public IActionResult GetSkills(string userId)
         {
-            var skills = _skillsRepository.GetSkillById(userId);
-            if (skills != null)
+            if (Whitespace.HasNullOrEmptyStringProperties(userId, out string propertyName))
             {
+                return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
+            }
+            try
+            {
+                var skills = _skillsRepository.GetSkillById(userId);
                 return ResponseHTTP.CreateResponse(200, "Skills info fetched!", skills);
             }
-            return ResponseHTTP.CreateResponse(404, "Skills info is not found!");
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
+            }
+
         }
 
         [HttpPost("Skills")]
@@ -193,17 +278,20 @@ namespace JobseekBerca.Controllers
             {
                 return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
-            var check = _skillsRepository.CheckUserId(skills.userId);
-            if (check > 0)
+            try
             {
                 var updateSkills = _skillsRepository.CreateSkill(skills);
-                if (updateSkills > 0)
-                {
-                    return ResponseHTTP.CreateResponse(200, "Skills info is updated!", skills);
-                }
-                return ResponseHTTP.CreateResponse(400, "Fail to update skills info!");
+                return ResponseHTTP.CreateResponse(200, "Skills info is updated!", skills);
             }
-            return ResponseHTTP.CreateResponse(404, "User info is not found");
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
+            }
         }
 
         [HttpPut("Skills")]
@@ -213,17 +301,20 @@ namespace JobseekBerca.Controllers
             {
                 return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
-            var check = _skillsRepository.GetSkillById(skills.userId);
-            if (check != null)
+            try
             {
+                //var check = _skillsRepository.GetSkillById(skills.userId);
                 var updateSkills = _skillsRepository.UpdateSkill(skills);
-                if (updateSkills > 0)
-                {
-                    return ResponseHTTP.CreateResponse(200, "Skills info is updated!", skills);
-                }
-                return ResponseHTTP.CreateResponse(400, "Fail to update skills info!");
+                return ResponseHTTP.CreateResponse(200, "Skills info is updated!", skills);
             }
-            return ResponseHTTP.CreateResponse(404, "Skills info is not found!");
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
+            }
         }
 
         [HttpDelete("Skills")]
@@ -233,69 +324,85 @@ namespace JobseekBerca.Controllers
             {
                 return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
-            var check = _skillsRepository.GetSkillById(deleteVM.userId);
-            if (check != null)
+            try
             {
-                var deleteSkills = _skillsRepository.DeleteSkill(deleteVM);
-                if (deleteSkills > 0)
-                {
-                    return ResponseHTTP.CreateResponse(200, "Skills info is deleted!");
-                }
-                return ResponseHTTP.CreateResponse(400, "Fail to delete skills info!");
+                _skillsRepository.DeleteSkill(deleteVM);
+                return ResponseHTTP.CreateResponse(200, "Skills info is deleted!");
             }
-            return ResponseHTTP.CreateResponse(404, "Skills info is not found!");
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
+            }
         }
 
         [HttpGet("Certificates")]
         public IActionResult GetCertificates(string userId)
         {
-            var certificates = _certificateRepository.GetCertificateById(userId);
-            if (certificates != null)
+            try
             {
+                var certificates = _certificateRepository.GetCertificateById(userId);
                 return ResponseHTTP.CreateResponse(200, "Certificates info fetched!", certificates);
+
             }
-            return ResponseHTTP.CreateResponse(404, "Certificates info is not found!");
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(404, e.Message);
+
+            }
+            //if (certificates != null)
+            //{
+            //}
         }
 
 
         [HttpPost("Certificates")]
         public IActionResult CreateCertificates(Certificates certificate)
         {
-            if (Whitespace.HasNullOrEmptyStringProperties(certificate, out string propertyName))
+            var nullableFields = new HashSet<string> { "credentialId", "credentialLink", "description" };
+            if (Whitespace.HasNullOrEmptyStringProperties(certificate, out string propertyName, nullableFields))
             {
                 return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
-            var check = _certificateRepository.CheckUserId(certificate.userId);
-            if (check > 0)
+            try
             {
                 var updateCertificate = _certificateRepository.CreateCertificate(certificate);
-                if (updateCertificate > 0)
-                {
-                    return ResponseHTTP.CreateResponse(200, "Certificate info is updated!", certificate);
-                }
-                return ResponseHTTP.CreateResponse(400, "Fail to update certificate info!");
+                return ResponseHTTP.CreateResponse(200, "Certificate info is updated!", certificate);
             }
-            return ResponseHTTP.CreateResponse(404, "User info is not found");
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message, certificate);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(400, e.Message);
+            }
         }
 
         [HttpPut("Certificates")]
         public IActionResult UpdateCertificates(Certificates certificates)
         {
-            if (Whitespace.HasNullOrEmptyStringProperties(certificates, out string propertyName))
+            var nullableFields = new HashSet<string> { "credentialId", "credentialLink", "description" };
+            if (Whitespace.HasNullOrEmptyStringProperties(certificates, out string propertyName, nullableFields))
             {
                 return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
-            var check = _certificateRepository.GetCertificateById(certificates.userId);
-            if (check != null)
+            try
             {
                 var updateCertificates = _certificateRepository.UpdateCertificate(certificates);
-                if (updateCertificates > 0)
-                {
-                    return ResponseHTTP.CreateResponse(200, "Certificates info is updated!", certificates);
-                }
-                return ResponseHTTP.CreateResponse(400, "Fail to update certificates info!");
+                return ResponseHTTP.CreateResponse(200, "Certificates info is updated!", certificates);
             }
-            return ResponseHTTP.CreateResponse(404, "Certificates info is not found!");
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(400, e.Message);
+            }
         }
 
         [HttpDelete("Certificates")]
@@ -305,17 +412,101 @@ namespace JobseekBerca.Controllers
             {
                 return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
-            var check = _certificateRepository.GetCertificateById(deleteVM.userId);
-            if (check != null)
+            try
             {
+                var check = _certificateRepository.GetCertificateById(deleteVM.userId);
                 var deleteCertificates = _certificateRepository.DeleteCertificate(deleteVM);
-                if (deleteCertificates > 0)
-                {
-                    return ResponseHTTP.CreateResponse(200, "Certificates info is deleted!");
-                }
-                return ResponseHTTP.CreateResponse(400, "Fail to delete certificates info!");
+                return ResponseHTTP.CreateResponse(200, "Certificates info is deleted!");
             }
-            return ResponseHTTP.CreateResponse(404, "Certificates info is not found!");
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+
+            }
+        }
+
+        [HttpGet("Social")]
+        public IActionResult GetSosmed(string userId)
+        {
+            try
+            {
+                var socialMedias = _socialMediaRepository.GetSocialMediasById(userId);
+                return ResponseHTTP.CreateResponse(200, "Social media info fetched!", socialMedias);
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(400, e.Message);
+            }
+        }
+
+        [HttpPost("Social")]
+        public IActionResult CreateSosmed(SocialMedias socialMedia)
+        {
+            if (Whitespace.HasNullOrEmptyStringProperties(socialMedia, out string propertyName))
+            {
+                return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
+            }
+            try
+            {
+                var createSocialMedia = _socialMediaRepository.CreateSocialMedia(socialMedia);
+                return ResponseHTTP.CreateResponse(200, "Social media info is created!", socialMedia);
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(400, e.Message);
+            }
+        }
+
+        [HttpPut("Social")]
+        public IActionResult UpdateSosmed(SocialMedias socialMedia)
+        {
+            if (Whitespace.HasNullOrEmptyStringProperties(socialMedia, out string propertyName))
+            {
+                return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
+            }
+            try
+            {
+                var updateSocialMedia = _socialMediaRepository.UpdateSocialMedia(socialMedia);
+                return ResponseHTTP.CreateResponse(200, "Social media info is updated!", socialMedia);
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(400, e.Message);
+            }
+        }
+
+        [HttpDelete("Social")]
+        public IActionResult DeleteSosmed(DeleteVM deleteVM)
+        {
+            if (Whitespace.HasNullOrEmptyStringProperties(deleteVM, out string propertyName))
+            {
+                return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
+            }
+            try
+            {
+                var deleteSocialMedia = _socialMediaRepository.DeleteSocialMedia(deleteVM);
+                return ResponseHTTP.CreateResponse(200, "Social media info is deleted!");
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(400, e.Message);
+            }
         }
     }
 }

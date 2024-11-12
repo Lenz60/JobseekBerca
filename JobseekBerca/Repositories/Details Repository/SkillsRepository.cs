@@ -1,4 +1,5 @@
 ﻿using JobseekBerca.Context;
+using JobseekBerca.Helper;
 using JobseekBerca.Models;
 using JobseekBerca.Repositories.Interfaces;
 using JobseekBerca.ViewModels;
@@ -23,39 +24,41 @@ namespace JobseekBerca.Repositories
             var check = _myContext.Users.Find(userId);
             if (check == null)
             {
-                return FAIL;
+                throw new HttpResponseExceptionHelper(404, "User not found");
             }
             return SUCCESS;
         }
 
         public int CreateSkill(Skills skill)
         {
-            var check = CheckUserId(skill.userId);
-            if (check == FAIL)
+            try
             {
-                return FAIL;
-            }
-            else
-            {
+                CheckUserId(skill.userId);
                 _myContext.Skills.Add(skill);
                 _myContext.SaveChanges();
                 return SUCCESS;
+
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
             }
         }
 
         public int UpdateSkill(Skills skill)
         {
-            var check = CheckUserId(skill.userId);
-            if (check == FAIL)
+            try
             {
-                return FAIL;
-            }
-            else
-            {
+                CheckUserId(skill.userId);
                 var checkSkill = _myContext.Skills.Find(skill.skillId);
                 if (checkSkill == null)
                 {
-                    return FAIL;
+                    throw new HttpResponseExceptionHelper(404, "Invalid skill id");
                 }
                 var newSkill = new Skills
                 {
@@ -67,37 +70,48 @@ namespace JobseekBerca.Repositories
                 _myContext.Entry(newSkill).State = EntityState.Modified;
                 return _myContext.SaveChanges();
 
+
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
             }
         }
 
         public int DeleteSkill(DetailsVM.DeleteVM skill)
         {
-            var check = CheckUserId(skill.userId);
-            if (check == FAIL)
+            try
             {
-                return FAIL;
-            }
-            else
-            {
+                CheckUserId(skill.userId);
                 var checkSkill = _myContext.Skills.Find(skill.id);
                 if (checkSkill == null)
                 {
-                    return FAIL;
+                    throw new HttpResponseExceptionHelper(404, "Invalid skill id");
+                    //return FAIL;
                 }
                 _myContext.Skills.Remove(checkSkill);
                 return _myContext.SaveChanges();
             }
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
+            }
+
         }
 
         public IEnumerable<Skills> GetSkillById(string userId)
         {
-            var check = CheckUserId(userId);
-            if (check == FAIL)
+            try
             {
-                return null;
-            }
-            else
-            {
+                CheckUserId(userId);
                 var skills = _myContext.Skills.Select(Skills => new Skills
                 {
                     skillId = Skills.skillId,
@@ -109,6 +123,14 @@ namespace JobseekBerca.Repositories
                     return null;
                 }
                 return skills;
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
             }
         }
     }

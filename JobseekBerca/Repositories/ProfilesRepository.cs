@@ -1,7 +1,9 @@
 ﻿using JobseekBerca.Context;
+using JobseekBerca.Helper;
 using JobseekBerca.Models;
 using JobseekBerca.Repositories.Interfaces;
 using JobseekBerca.ViewModels;
+using Microsoft.AspNetCore.Server.IIS.Core;
 using Microsoft.EntityFrameworkCore;
 using static JobseekBerca.ViewModels.ProfileVM;
 
@@ -20,34 +22,41 @@ namespace JobseekBerca.Repositories
 
         public ProfileVM.GetVM GetProfile(string userId)
         {
-            var check = CheckUserId(userId);
-            if (check == SUCCESS)
+            try
             {
+                CheckUserId(userId);
                 var profile = _myContext.Profiles.Find(userId);
+                if (profile == null)
+                {
+                    throw new HttpResponseExceptionHelper(404, "Profile not found");
+                }
                 var getProfile = new ProfileVM.GetVM
                 {
                     fullName = profile.fullName,
                     summary = profile.summary,
+                    phoneNumber = profile.phoneNumber,
                     gender = profile.gender,
                     address = profile.address,
                     birthDate = profile.birthDate
                 };
                 return getProfile;
             }
-            return null;
-
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
+            }
         }
 
         public int CreateProfile(ProfileVM.CreateVM create)
         {
             //throw new NotImplementedException();
-            var check = CheckUserId(create.userId);
-            if (check == FAIL)
+            try
             {
-                return FAIL;
-            }
-            else
-            {
+                CheckUserId(create.userId);
                 var profile = new Profiles
                 {
                     userId = create.userId,
@@ -58,44 +67,56 @@ namespace JobseekBerca.Repositories
                     phoneNumber = create.address,
                     birthDate = create.birthDate
                 };
-
-                var add = _myContext.Profiles.Add(profile);
-                if (add == null)
-                {
-                    return INTERNAL_ERROR;
-                }
-                return SUCCESS;
-
+                _myContext.Profiles.Add(profile);
+                return _myContext.SaveChanges();
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
             }
         }
 
         public int CheckUserId(string userId)
         {
-            //throw new NotImplementedException();
-            var check = _myContext.Users.Find(userId);
-            if (check == null)
+            try
             {
-                return FAIL;
+                var check = _myContext.Users.Find(userId);
+                if (check == null)
+                {
+                    throw new HttpResponseExceptionHelper(404, "User is not found");
+                }
+                return SUCCESS;
             }
-            return SUCCESS;
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
+            }
         }
 
         public int UpdateProfile(UpdateVM update)
         {
-            var check = CheckUserId(update.userId);
-            if (check == FAIL)
+            try
             {
-                return FAIL;
-            }
-            else
-            {
-
+                CheckUserId(update.userId);
                 var profile = _myContext.Profiles.Find(update.userId);
+                if (profile == null)
+                {
+                    throw new HttpResponseExceptionHelper(404, "Profile is not found");
+                }
                 var newProfile = new Profiles
                 {
                     userId = update.userId,
                     fullName = update.fullName,
                     summary = update.summary,
+                    phoneNumber = update.phoneNumber,
                     gender = update.gender,
                     address = update.address,
                     birthDate = update.birthDate
@@ -103,7 +124,14 @@ namespace JobseekBerca.Repositories
                 _myContext.Entry(profile).State = EntityState.Detached;
                 _myContext.Entry(newProfile).State = EntityState.Modified;
                 return _myContext.SaveChanges();
-
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
             }
         }
     }

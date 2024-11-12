@@ -55,9 +55,9 @@ namespace JobseekBerca.Controllers
         }
 
         [HttpDelete("{jobId}")]
-        public IActionResult DeleteJobs(string jobId)
+        public IActionResult DeleteJobs(string userId,string jobId)
         {
-            int result = _jobsRepository.DeleteJobs(jobId);
+            int result = _jobsRepository.DeleteJobs(userId,jobId);
             if (result > 0)
             {
                 return ResponseHTTP.CreateResponse(200, "Success deleted job.");

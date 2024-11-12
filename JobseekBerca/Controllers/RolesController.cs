@@ -5,6 +5,7 @@ using JobseekBerca.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
+using static JobseekBerca.ViewModels.UserVM;
 
 namespace JobseekBerca.Controllers
 {
@@ -22,46 +23,62 @@ namespace JobseekBerca.Controllers
         [HttpGet]
         public IActionResult GetAllRoles()
         {
-            var data = _rolesRepository.GetAllRole();
-
-            if (data == null)
+            try
             {
-                return ResponseHTTP.CreateResponse(200, "No data Roles.");
-            }
-            else
-            {
+                var data = _rolesRepository.GetAllRole();
                 return ResponseHTTP.CreateResponse(200, "Roles retrieved successfully.", data);
+
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
             }
         }
 
         [HttpPost]
         public IActionResult AddRoles(Roles roles)
         {
-            if (string.IsNullOrEmpty(roles.roleName))
+            if (Whitespace.HasNullOrEmptyStringProperties(roles, out string propertyName))
             {
-                return ResponseHTTP.CreateResponse(400, "Role name is required!");
+                return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
-            var addRole = _rolesRepository.AddRole(roles);
-
-            if (addRole > 0)
+            try
             {
+                var addRole = _rolesRepository.AddRole(roles);
                 return ResponseHTTP.CreateResponse(200, "Success add new role", roles);
+
             }
-            else
+            catch (HttpResponseExceptionHelper e)
             {
-                return ResponseHTTP.CreateResponse(404, "Role Failed added");
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
             }
         }
 
-        [HttpDelete("{roleId}")]
+        [HttpDelete]
         public IActionResult DeleteRole(string roleId)
         {
-            int result = _rolesRepository.DeleteRole(roleId);
-            if (result > 0)
+            try
             {
+                int result = _rolesRepository.DeleteRole(roleId);
                 return ResponseHTTP.CreateResponse(200, "Success deleted role.");
+
             }
-            return ResponseHTTP.CreateResponse(404, "No role found with the sepecific id.");
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
+            }
         }
 
         [HttpPut]
@@ -71,13 +88,21 @@ namespace JobseekBerca.Controllers
             {
                 return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
-            int data = _rolesRepository.UpdateRole(roles);
-
-            if (data > 0)
+            try
             {
+                int data = _rolesRepository.UpdateRole(roles);
                 return ResponseHTTP.CreateResponse(200, "Role successfully updated.", roles);
+
             }
-            return ResponseHTTP.CreateResponse(404, "No role found with the sepecific id.");
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
+            }
+
         }
     }
 }

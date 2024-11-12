@@ -19,73 +19,89 @@ namespace JobseekBerca.Controllers
             _applicationsRepository = applicationsRepository;
         }
 
-        [HttpGet]
+        [HttpGet("All")]
         public IActionResult GetAllApplications()
         {
-            var data = _applicationsRepository.GetAllApplications();
+            try
+            {
+                var applications = _applicationsRepository.GetAllApplications();
+                return ResponseHTTP.CreateResponse(200, "Applications retrieved successfully.", applications);
 
-            if (data == null)
-            {
-                return ResponseHTTP.CreateResponse(200, "No data Applications.");
             }
-            else
+            catch (HttpResponseExceptionHelper e)
             {
-                return ResponseHTTP.CreateResponse(200, "Applications retrieved successfully.", data);
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
+            }
+        }
+        [HttpGet]
+        public IActionResult GetAllApplicationsById(string userId)
+        {
+            try
+            {
+                var applications = _applicationsRepository.GetUserApplications(userId);
+                return ResponseHTTP.CreateResponse(200, "Applications retrieved successfully.", applications);
+
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
             }
         }
 
         [HttpPost]
         public IActionResult AddApplications(Applications applications)
         {
-            if (string.IsNullOrEmpty(applications.status))
+            var nullableFields = new HashSet<string> { "applicationId" };
+            if (Whitespace.HasNullOrEmptyStringProperties(applications, out string propertyName,nullableFields))
             {
-                return ResponseHTTP.CreateResponse(400, "Status is required!");
+                return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
-            if (string.IsNullOrWhiteSpace(applications.jobId))
+            try
             {
-                return StatusCode(200, new
-                {
-                    StatusCode = 200,
-                    Message = $"Job Id is Required"
-                });
-            }
-            if (string.IsNullOrWhiteSpace(applications.userId))
-            {
-                return StatusCode(200, new
-                {
-                    StatusCode = 200,
-                    Message = $"User Id is Required"
-                });
-            }
-            var addApplication = _applicationsRepository.AddApplications(applications);
-
-            if (addApplication > 0)
-            {
+                var addApplication = _applicationsRepository.AddApplications(applications);
                 return ResponseHTTP.CreateResponse(200, "Success add new applications", applications);
+
             }
-            else
+            catch (HttpResponseExceptionHelper e)
             {
-                return ResponseHTTP.CreateResponse(404, "Application Failed added");
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
             }
         }
 
-        [HttpPut("{applicationId}")]
-        public IActionResult UpdateApplications(string applicationId, [FromBody] Applications applications)
+        [HttpPut]
+        public IActionResult UpdateApplications(Applications applications)
         {
-            if (string.IsNullOrEmpty(applications.applicationId))
+            //var nullableFields = new HashSet<string> { "credentialId", "credentialLink", "description" };
+            if (Whitespace.HasNullOrEmptyStringProperties(applications, out string propertyName))
             {
-                return ResponseHTTP.CreateResponse(400, "ApplicationID is required!");
-            }else if (string.IsNullOrEmpty(applications.status))
-            {
-                return ResponseHTTP.CreateResponse(400, "Status is required!");
+                return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
-            int data = _applicationsRepository.UpdateApplications(applications);
-
-            if (data > 0)
+            try
             {
+                _applicationsRepository.UpdateApplications(applications);
                 return ResponseHTTP.CreateResponse(200, "Application successfully updated.", applications);
+
             }
-            return ResponseHTTP.CreateResponse(404, "No applications found with the sepecific id.");
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
+            }
         }
     }
 }

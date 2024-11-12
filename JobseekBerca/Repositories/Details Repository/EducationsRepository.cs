@@ -1,4 +1,5 @@
 ﻿using JobseekBerca.Context;
+using JobseekBerca.Helper;
 using JobseekBerca.Models;
 using JobseekBerca.Repositories.Interfaces;
 using JobseekBerca.ViewModels;
@@ -23,39 +24,42 @@ namespace JobseekBerca.Repositories
             var check = _myContext.Users.Find(userId);
             if (check == null)
             {
-                return FAIL;
+                //return FAIL;
+                throw new HttpResponseExceptionHelper(404, "User is not found");
             }
             return SUCCESS;
         }
 
         public int CreateEducation(Educations education)
         {
-            var check = CheckUserId(education.userId);
-            if (check == FAIL)
+
+            try
             {
-                return FAIL;
-            }
-            else
-            {
+                CheckUserId(education.userId);
                 _myContext.Educations.Add(education);
                 _myContext.SaveChanges();
                 return SUCCESS;
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
             }
         }
 
         public int UpdateEducation(Educations education)
         {
-            var check = CheckUserId(education.userId);
-            if (check == FAIL)
+            try
             {
-                return FAIL;
-            }
-            else
-            {
+                CheckUserId(education.userId);
                 var checkEducation = _myContext.Educations.Find(education.educationId);
                 if (checkEducation == null)
                 {
-                    return FAIL;
+                    //return FAIL;
+                    throw new HttpResponseExceptionHelper(403, "Invalid education id");
                 }
                 var newEducation = new Educations
                 {
@@ -71,38 +75,47 @@ namespace JobseekBerca.Repositories
                 _myContext.Entry(checkEducation).State = EntityState.Detached;
                 _myContext.Entry(newEducation).State = EntityState.Modified;
                 return _myContext.SaveChanges();
-
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
             }
         }
 
         public int DeleteEducation(DetailsVM.DeleteVM education)
         {
-            var check = CheckUserId(education.userId);
-            if (check == FAIL)
+            try
             {
-                return FAIL;
-            }
-            else
-            {
+                CheckUserId(education.userId);
                 var checkEducation = _myContext.Educations.Find(education.id);
                 if (checkEducation == null)
                 {
-                    return FAIL;
+                    //return FAIL;
+                    throw new HttpResponseExceptionHelper(403, "Invalid education id");
                 }
                 _myContext.Educations.Remove(checkEducation);
                 return _myContext.SaveChanges();
             }
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
+            }
+
         }
 
         public IEnumerable<Educations> GetEducationById(string userId)
         {
-            var check = CheckUserId(userId);
-            if (check == FAIL)
+            try
             {
-                return null;
-            }
-            else
-            {
+                CheckUserId(userId);
                 var educations = _myContext.Educations.Select(Educations => new Educations
                 {
                     userId = Educations.userId,
@@ -116,9 +129,19 @@ namespace JobseekBerca.Repositories
                 }).Where(x => x.userId == userId).ToList();
                 if (educations == null)
                 {
-                    return null;
+                    //return null;
+                    throw new HttpResponseExceptionHelper(404, "There is no education");
                 }
                 return educations;
+
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
             }
         }
     }

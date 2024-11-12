@@ -5,6 +5,7 @@ using JobseekBerca.ViewModels;
 using JobseekBerca.Models;
 using JobseekBerca.Helper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Server.IIS.Core;
 
 namespace JobseekBerca.Repositories
 {
@@ -12,7 +13,9 @@ namespace JobseekBerca.Repositories
     {
         private readonly MyContext _myContext;
 
-        public int FAIL { get; private set; }
+        public const int INTERNAL_ERROR = -1;
+        public const int SUCCESS = 1;
+        public const int FAIL = 0;
 
         public JobsRepository(MyContext myContext)
         {
@@ -29,50 +32,115 @@ namespace JobseekBerca.Repositories
             var selectedJob = _myContext.Jobs.Find(jobId);
             if (selectedJob != null)
             {
-            return selectedJob;
+                return selectedJob;
             }
             return null;
         }
 
         public int AddJobs(Jobs jobs)
         {
-            var checkId = _myContext.Jobs.OrderByDescending(j => j.jobId).FirstOrDefault();
+            try
+            {
+                var checkRole = _myContext.Users
+                    .Where(x => x.userId == jobs.userId)
+                    .Select(u => u.roleId).FirstOrDefault();
+                if (checkRole == "R02")
+                {
+                    var checkId = _myContext.Jobs.OrderByDescending(j => j.jobId).FirstOrDefault();
 
-            if (checkId != null)
-            {
-                int lastId = int.Parse(checkId.jobId.Substring(1));
-                jobs.jobId = "J" + (lastId + 1).ToString("D2");
+                    if (checkId != null)
+                    {
+                        int lastId = int.Parse(checkId.jobId.Substring(1));
+                        jobs.jobId = "J" + (lastId + 1).ToString("D2");
+                    }
+                    else
+                    {
+                        jobs.jobId = "J01";
+                    }
+                    _myContext.Jobs.Add(jobs);
+                    return _myContext.SaveChanges();
+                }
+                throw new HttpResponseExceptionHelper(403, "Unauthorized access");
             }
-            else
+            catch (HttpResponseExceptionHelper e)
             {
-                jobs.jobId = "J01";
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
             }
-            _myContext.Jobs.Add(jobs);
-            return _myContext.SaveChanges();
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
+            }
         }
 
         public int UpdateJobs(Jobs jobs)
         {
-            var exists = _myContext.Jobs.Any(j => j.jobId == jobs.jobId);
-
-            if (exists)
+            try
             {
-                _myContext.Entry(jobs).State = EntityState.Modified;
-                return _myContext.SaveChanges();
+                var checkRole = _myContext.Users
+                    .Where(x => x.userId == jobs.userId)
+                    .Select(u => u.roleId).FirstOrDefault();
+                if (checkRole == "R02")
+                {
+                    var checkJob = _myContext.Jobs.Find(jobs.jobId);
+                    if (checkJob == null)
+                    {
+                        throw new HttpResponseExceptionHelper(404, "Invalid job id");
+                    }
+                    var newJob = new Jobs
+                    {
+                        jobId = jobs.jobId,
+                        title = jobs.title,
+                        description = jobs.description,
+                        type = jobs.type,
+                        salary = jobs.salary,
+                        requirement = jobs.requirement,
+                        location = jobs.location,
+                        userId = jobs.userId
+                    };
+                    _myContext.Entry(checkJob).State = EntityState.Detached;
+                    _myContext.Entry(newJob).State = EntityState.Modified;
+                    return _myContext.SaveChanges();
+                }
+                throw new HttpResponseExceptionHelper(403, "Unauthorized access");
             }
-
-            return FAIL;
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
+            }
         }
 
-        public int DeleteJobs(string jobId)
+        public int DeleteJobs(string userId, string jobId)
         {
-            var data = _myContext.Jobs.Find(jobId);
-            if (data != null)
+            try
             {
-                _myContext.Jobs.Remove(data);
-                return _myContext.SaveChanges();
+                var checkRole = _myContext.Users
+                        .Where(x => x.userId == userId)
+                        .Select(u => u.roleId).FirstOrDefault();
+                if (checkRole == "R02")
+                {
+                    var data = _myContext.Jobs.Find(jobId);
+                    if (data != null)
+                    {
+                        _myContext.Jobs.Remove(data);
+                        return _myContext.SaveChanges();
+                    }
+                    //return FAIL;
+                    throw new HttpResponseExceptionHelper(404, "Invalid job id");
+                }
+                throw new HttpResponseExceptionHelper(403, "Unauthorized access");                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
             }
-            return FAIL;
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using JobseekBerca.Context;
+using JobseekBerca.Helper;
 using JobseekBerca.Models;
 using JobseekBerca.Repositories.Interfaces;
 using JobseekBerca.ViewModels;
@@ -23,39 +24,42 @@ namespace JobseekBerca.Repositories
             var check = _myContext.Users.Find(userId);
             if (check == null)
             {
-                return FAIL;
+                //return FAIL;
+                throw new HttpResponseExceptionHelper(404, "User is not found");
             }
             return SUCCESS;
         }
 
         public int CreateExperience(Experiences experience)
         {
-            var check = CheckUserId(experience.userId);
-            if (check == FAIL)
+            try
             {
-                return FAIL;
-            }
-            else
-            {
+                CheckUserId(experience.userId);
                 _myContext.Experiences.Add(experience);
                 _myContext.SaveChanges();
                 return SUCCESS;
             }
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
+            }
+
         }
 
         public int UpdateExperience(Experiences experience)
         {
-            var check = CheckUserId(experience.userId);
-            if (check == FAIL)
+            try
             {
-                return FAIL;
-            }
-            else
-            {
+                CheckUserId(experience.userId);
                 var checkExperience = _myContext.Experiences.Find(experience.experienceId);
                 if (checkExperience == null)
                 {
-                    return FAIL;
+                    //return FAIL;
+                    throw new HttpResponseExceptionHelper(404, "Invalid experience id");
                 }
                 var newExperience = new Experiences
                 {
@@ -71,38 +75,49 @@ namespace JobseekBerca.Repositories
                 _myContext.Entry(checkExperience).State = EntityState.Detached;
                 _myContext.Entry(newExperience).State = EntityState.Modified;
                 return _myContext.SaveChanges();
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
 
             }
         }
 
         public int DeleteExperience(DetailsVM.DeleteVM experience)
         {
-            var check = CheckUserId(experience.userId);
-            if (check == FAIL)
+            try
             {
-                return FAIL;
-            }
-            else
-            {
+                CheckUserId(experience.userId);
                 var checkExperience = _myContext.Experiences.Find(experience.id);
                 if (checkExperience == null)
                 {
-                    return FAIL;
+                    //return FAIL;
+                    throw new HttpResponseExceptionHelper(404, "Invalid experience id");
                 }
                 _myContext.Experiences.Remove(checkExperience);
                 return _myContext.SaveChanges();
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
             }
         }
 
         public IEnumerable<Experiences> GetExperienceById(string userId)
         {
-            var check = CheckUserId(userId);
-            if (check == FAIL)
+            try
             {
-                return null;
-            }
-            else
-            {
+                CheckUserId(userId);
                 var experiences = _myContext.Experiences.Select(Experiences => new Experiences
                 {
                     experienceId = Experiences.experienceId,
@@ -116,9 +131,18 @@ namespace JobseekBerca.Repositories
                 }).Where(x => x.userId == userId).ToList();
                 if (experiences == null)
                 {
-                    return null;
+                    throw new HttpResponseExceptionHelper(404, "Experiences not found");
+                    //return null;
                 }
                 return experiences;
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
             }
         }
     }

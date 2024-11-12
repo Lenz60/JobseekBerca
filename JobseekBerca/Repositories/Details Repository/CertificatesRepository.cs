@@ -3,7 +3,9 @@ using JobseekBerca.Models;
 using JobseekBerca.Repositories.Interfaces;
 using JobseekBerca.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using JobseekBerca.Helper;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using Microsoft.AspNetCore.Server.IIS.Core;
 
 namespace JobseekBerca.Repositories
 {
@@ -24,45 +26,46 @@ namespace JobseekBerca.Repositories
             var check = _myContext.Users.Find(userId);
             if (check == null)
             {
-                return FAIL;
+                throw new HttpResponseExceptionHelper(404, "User not found");
             }
             return SUCCESS;
         }
 
         public int CreateCertificate(Certificates certificate)
         {
-            var check = CheckUserId(certificate.userId);
-            if (check == FAIL)
+            try
             {
-                return FAIL;
-            }
-            else
-            {
+                CheckUserId(certificate.userId);
                 _myContext.Certificates.Add(certificate);
                 _myContext.SaveChanges();
                 return SUCCESS;
+
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
             }
         }
 
         public int UpdateCertificate(Certificates certificate)
         {
-            var check = CheckUserId(certificate.userId);
-            if (check == FAIL)
+            try
             {
-                return FAIL;
-            }
-            else
-            {
-
+                CheckUserId(certificate.userId);
                 var checkCertficate = _myContext.Certificates.Find(certificate.certificateId);
                 if (checkCertficate == null)
                 {
-                    return FAIL;
+                    throw new HttpResponseExceptionHelper(404, "Certificate not found");
                 }
                 var newCertificate = new Certificates
                 {
                     certificateId = certificate.certificateId,
-                    certificateName = certificate.certificateName,
+                    title = certificate.title,
                     credentialId = certificate.credentialId,
                     credentialLink = certificate.credentialLink,
                     description = certificate.description,
@@ -74,42 +77,58 @@ namespace JobseekBerca.Repositories
                 _myContext.Entry(checkCertficate).State = EntityState.Detached;
                 _myContext.Entry(newCertificate).State = EntityState.Modified;
                 return _myContext.SaveChanges();
-
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
             }
         }
 
         public int DeleteCertificate(DetailsVM.DeleteVM certificate)
         {
-            var check = CheckUserId(certificate.userId);
-            if (check == FAIL)
+            try
             {
-                return FAIL;
-            }
-            else
-            {
+                CheckUserId(certificate.userId);
                 var checkCertificate = _myContext.Certificates.Find(certificate.id);
                 if (checkCertificate == null)
                 {
-                    return FAIL;
+                    throw new HttpResponseExceptionHelper(404, "Certificate not found");
                 }
                 _myContext.Certificates.Remove(checkCertificate);
                 return _myContext.SaveChanges();
+
             }
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
+
+            }
+            //if (check == FAIL)
+            //{
+            //}
+            //else
+            //{
+            //}
         }
 
         public IEnumerable<Certificates> GetCertificateById(string userId)
         {
-            var check = CheckUserId(userId);
-            if (check == FAIL)
+            try
             {
-                return null;
-            }
-            else
-            {
+                CheckUserId(userId);
                 var certificates = _myContext.Certificates.Select(Certificates => new Certificates
                 {
                     certificateId = Certificates.certificateId,
-                    certificateName = Certificates.certificateName,
+                    title = Certificates.title,
                     credentialId = Certificates.credentialId,
                     credentialLink = Certificates.credentialLink,
                     description = Certificates.description,
@@ -119,9 +138,17 @@ namespace JobseekBerca.Repositories
                 }).Where(x => x.userId == userId).ToList();
                 if (certificates == null)
                 {
-                    return null;
+                    throw new HttpResponseExceptionHelper(404, "No certificate found");
                 }
                 return certificates;
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
             }
         }
     }

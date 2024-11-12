@@ -1,4 +1,5 @@
 ﻿using JobseekBerca.Context;
+using JobseekBerca.Helper;
 using JobseekBerca.Models;
 using JobseekBerca.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -17,49 +18,88 @@ namespace JobseekBerca.Repositories
         public const int FAIL = 0;
         public int AddRole(Roles roles)
         {
-            var checkId = _myContext.Roles.OrderByDescending(d => d.roleId).FirstOrDefault();
-
-            if (checkId != null)
+            try
             {
-                int lastId = int.Parse(checkId.roleId.Substring(1));
-                roles.roleId = "R" + (lastId + 1).ToString("D2");
+                var checkId = _myContext.Roles.OrderByDescending(d => d.roleId).FirstOrDefault();
+                if (checkId != null)
+                {
+                    int lastId = int.Parse(checkId.roleId.Substring(1));
+                    roles.roleId = "R" + (lastId + 1).ToString("D2");
+                }
+                else
+                {
+                    roles.roleId = "R01";
+                }
+                _myContext.Roles.Add(roles);
+                return _myContext.SaveChanges();
             }
-            else
+            catch (HttpResponseExceptionHelper e)
             {
-                roles.roleId = "R01";
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
             }
-            _myContext.Roles.Add(roles);
-            return _myContext.SaveChanges();
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
+            }
         }
 
         public int DeleteRole(string roleId)
         {
-            var data = _myContext.Roles.Find(roleId);
-            if (data != null)
+            try
             {
-                _myContext.Roles.Remove(data);
-                return _myContext.SaveChanges();
+                var data = _myContext.Roles.Find(roleId);
+                if (data != null)
+                {
+                    _myContext.Roles.Remove(data);
+                    return _myContext.SaveChanges();
+                }
+                throw new HttpResponseExceptionHelper(404, "Invalid role id");
             }
-            return FAIL;
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
+            }
+            //returns FAIL;
         }
 
         public IEnumerable<Roles> GetAllRole()
         {
-            return _myContext.Roles.ToList();
+            try
+            {
+                return _myContext.Roles.ToList();
+
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
+            }
         }
 
 
         public int UpdateRole(Roles roles)
         {
-            var exists = _myContext.Roles.Any(r => r.roleId == roles.roleId);
-
-            if (exists)
+            try
             {
-                _myContext.Entry(roles).State = EntityState.Modified;
-                return _myContext.SaveChanges();
+                var role = _myContext.Roles.Any(r => r.roleId == roles.roleId);
+                if (role)
+                {
+                    _myContext.Entry(roles).State = EntityState.Modified;
+                    return _myContext.SaveChanges();
+                }
+                throw new HttpResponseExceptionHelper(404, "Invalid role id");
             }
-
-            return FAIL;
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
+            }
         }
     }
 }

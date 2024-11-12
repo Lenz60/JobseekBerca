@@ -43,102 +43,172 @@ namespace JobseekBerca.Repositories
         }
         public bool CheckEmail(string email)
         {
-            return _myContext.Users.Any(e => e.email == email);
+            try
+            {
+                return _myContext.Users.Any(e => e.email == email);
+
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
+            }
 
         }
         public int Register(UserVM.RegisterVM registervm)
         {
-            string hashedPassword = HashingHelper.HashPassword(registervm.password);
-            var newUser = new Users
+            try
             {
-                // Generate userId with UID increment based on last created
-                // userId = GenerateIdUser(),
-                // Generate userId with ULID
-                userId = ULIDHelper.GenerateULID(),
-                email = registervm.email,
-                roleId = "R03",
-                password = hashedPassword,
-            };
+                string hashedPassword = HashingHelper.HashPassword(registervm.password);
+                var newUser = new Users
+                {
+                    userId = ULIDHelper.GenerateULID(),
+                    email = registervm.email,
+                    roleId = "R03",
+                    password = hashedPassword,
+                };
 
-            var newProfile = new Profiles
+                var newProfile = new Profiles
+                {
+                    userId = newUser.userId,
+                    fullName = $"{registervm.firstName} {registervm.lastName}",
+                    summary = $"Hello my name is {registervm.firstName} {registervm.lastName} and I'm eager to learn",
+                    gender = null,
+                    address = null,
+                    birthDate = null,
+                };
+
+                _myContext.Users.Add(newUser);
+                _myContext.Profiles.Add(newProfile);
+                return _myContext.SaveChanges();
+
+            }
+            catch (HttpResponseExceptionHelper e)
             {
-                userId = newUser.userId,
-                fullName = $"{registervm.firstName} {registervm.lastName}",
-                summary = $"Hello my name is {registervm.firstName} {registervm.lastName} and I'm eager to learn",
-                gender = null,
-                address = null,
-                birthDate = null,
-            };
-
-            _myContext.Users.Add(newUser);
-            _myContext.Profiles.Add(newProfile);
-            return _myContext.SaveChanges();
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
+            }
 
         }
 
         public int ChangePassword(ChangePasswordVM changePassword)
         {
-            var cekData = _myContext.Users
-           .FirstOrDefault(a => a.userId == changePassword.userId);
-
-            if (cekData == null)
+            try
             {
-                return FAIL;
-            }
-            if (!HashingHelper.ValidatePassword(changePassword.oldPassword, cekData.password))
-            {
-                return INVALID_PASSWORD;
-            }
+                var cekData = _myContext.Users
+               .FirstOrDefault(a => a.userId == changePassword.userId);
 
-            cekData.password = HashingHelper.HashPassword(changePassword.newPassword);
-            _myContext.Users.Update(cekData);
-            return _myContext.SaveChanges();
+                if (cekData == null)
+                {
+                    throw new HttpResponseExceptionHelper(404, "User is not found");
+                }
+                if (!HashingHelper.ValidatePassword(changePassword.oldPassword, cekData.password))
+                {
+                    throw new HttpResponseExceptionHelper(400, "Wrong password");
+                }
+
+                cekData.password = HashingHelper.HashPassword(changePassword.newPassword);
+                _myContext.Users.Update(cekData);
+                return _myContext.SaveChanges();
+
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
+            }
         }
 
         public int Login(UserVM.LoginVM login)
         {
-            var data = _myContext.Users
-                .FirstOrDefault(a =>  a.email == login.email);
-
-            if (data == null)
+            try
             {
-                return ACCOUNT_NOT_FOUND;
+                var user = _myContext.Users
+                    .FirstOrDefault(a => a.email == login.email);
+
+                if (user == null)
+                {
+                    throw new HttpResponseExceptionHelper(404, "Email is not registered");
+                }
+                bool isValid = HashingHelper.ValidatePassword(login.password, user.password);
+                if (isValid)
+                {
+                    return SUCCESS;
+                }
+                throw new HttpResponseExceptionHelper(400, "Wrong password");
             }
-            bool isValid = HashingHelper.ValidatePassword(login.password, data.password);
-            return isValid ? SUCCESS : INVALID_PASSWORD;
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
+            }
         }
         public int CheckUserId(string userId)
         {
             //throw new NotImplementedException();
-            var check = _myContext.Users.Find(userId);
-            if (check == null)
+            try
             {
-                return FAIL;
+                var check = _myContext.Users.Find(userId);
+                if (check == null)
+                {
+                    throw new HttpResponseExceptionHelper(404, "User is not found");
+                }
+                return SUCCESS;
             }
-            return SUCCESS;
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
+            }
         }
-
-        
-
         public PayloadVM.GenerateVM GetCredsByEmail(string email)
         {
-            var check = CheckEmail(email);
-            if (!check)
+            try
             {
-                return null;
+                var check = CheckEmail(email);
+                if (!check)
+                {
+                    throw new HttpResponseExceptionHelper(404, "Invalid email");
+                }
+                var payload = _myContext.Users.Select(u => new PayloadVM.GenerateVM
+                {
+                    userId = u.userId,
+                    roleId = u.roleId,
+                    email = u.email
+                }).FirstOrDefault(u => u.email == email);
+                return payload;
             }
-            var payload = _myContext.Users.Select(u => new PayloadVM.GenerateVM
+            catch (HttpResponseExceptionHelper e)
             {
-                userId = u.userId,
-                roleId = u.roleId,
-                email = u.email
-            }).FirstOrDefault(u => u.email == email);
-            return payload;
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
+            }
         }
 
         public string GenerateToken(PayloadVM.GenerateVM payload)
         {
-            return JWTHelper.GenerateToken(payload, _config);
+            try
+            {
+                return JWTHelper.GenerateToken(payload, _config);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
+            }
         }
     }
 }

@@ -22,68 +22,62 @@ namespace JobseekBerca.Controllers
         [HttpPost("GetById")]
         public IActionResult Get(string userId)
         {
-            //return Ok();
-            var check = _profilesRepository.GetProfile(userId);
-            if (check != null)
+            //var nullableFields = new HashSet<string> { "credentialId", "credentialLink", "description" };
+            if (Whitespace.HasNullOrEmptyStringProperties(userId, out string propertyName))
             {
-                return ResponseHTTP.CreateResponse(200, "User info is fetched!", check);
+                return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
-            return ResponseHTTP.CreateResponse(400, "User info not found!");
+            try
+            {
+                var profile = _profilesRepository.GetProfile(userId);
+                return ResponseHTTP.CreateResponse(200, "User info is fetched!", profile);
+
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
+            }
         }
 
         [HttpPost("Update")]
         public IActionResult Update(ProfileVM.UpdateVM update)
         {
-            if (string.IsNullOrWhiteSpace(update.userId))
-            {
-                return ResponseHTTP.CreateResponse(400, "User Id is required!");
-            }
-            if (string.IsNullOrWhiteSpace(update.fullName))
-            {
-                return ResponseHTTP.CreateResponse(400, "Full Name is required!");
-            }
-            //if (string.IsNullOrWhiteSpace(update.summary))
+
+            //if (!Enum.IsDefined(typeof(Gender), update.gender) || string.IsNullOrWhiteSpace(update.gender.ToString()))
             //{
-            //    return ResponseHTTP.CreateResponse(400, "Summary is required!");
+            //    return ResponseHTTP.CreateResponse(400, "Gender is invalid!");
             //}
-            if (string.IsNullOrWhiteSpace(update.address))
+            //if (string.IsNullOrEmpty(update.birthDate.ToString()))
+            //{
+            //    return ResponseHTTP.CreateResponse(400, "Birth Date is required!");
+            //}
+            //if (!DateTime.TryParse(update.birthDate.ToString(), out DateTime birthDate))
+            //{
+            //    return ResponseHTTP.CreateResponse(400, "Birth Date is invalid!");
+            //}
+            var nullableFields = new HashSet<string> { "summary", "address" };
+            if (Whitespace.HasNullOrEmptyStringProperties(update, out string propertyName, nullableFields))
             {
-                return ResponseHTTP.CreateResponse(400, "Address is required!");
+                return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
-            if (!Enum.IsDefined(typeof(Gender), update.gender) || string.IsNullOrWhiteSpace(update.gender.ToString()))
+            try
             {
-                return ResponseHTTP.CreateResponse(400, "Gender is invalid!");
-            }
-            if (string.IsNullOrEmpty(update.birthDate.ToString()))
-            {
-                return ResponseHTTP.CreateResponse(400, "Birth Date is required!");
-            }
-            if (!DateTime.TryParse(update.birthDate.ToString(), out DateTime birthDate))
-            {
-                return ResponseHTTP.CreateResponse(400, "Birth Date is invalid!");
-            }
+                _profilesRepository.UpdateProfile(update);
+                return ResponseHTTP.CreateResponse(200, "User info is updated!", update);
 
-
-            var check = _profilesRepository.GetProfile(update.userId);
-            if (check != null)
-            {
-                try
-                {
-                    var updateProfile = _profilesRepository.UpdateProfile(update);
-                    if (updateProfile > 0)
-                    {
-                        return ResponseHTTP.CreateResponse(200, "User info is updated!", update);
-                    }
-
-                }
-                catch (Exception e)
-                {
-                    return ResponseHTTP.CreateResponse(400, e.Message);
-                }
-                return ResponseHTTP.CreateResponse(400, "Fail to update user info!");
             }
-            return ResponseHTTP.CreateResponse(404, "User info is not found");
-
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
+            }
         }
     }
 }

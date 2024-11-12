@@ -28,20 +28,15 @@ namespace JobseekBerca.Repositories
             var check = _myContext.Users.Find(userId);
             if (check == null)
             {
-                return FAIL;
+                throw new HttpResponseExceptionHelper(404, "User not found");
             }
             return SUCCESS;
         }
         public int CreateSavedJob(string userId, string jobId)
         {
-            var check = CheckUserId(userId);
-            if (check == FAIL)
+            try
             {
-                //return FAIL;
-                throw new HttpResponseExceptionHelper(403, "Invalid User");
-            }
-            else
-            {
+                CheckUserId(userId);
                 var checkRole = _myContext.Users
                     .Where(x => x.userId == userId)
                     .Select(u => u.roleId).FirstOrDefault();
@@ -61,9 +56,16 @@ namespace JobseekBerca.Repositories
                     _myContext.SaveChanges();
                     return SUCCESS;
                 }
-                //return FAIL;
-                //throw new Exception("Unauthorized");
-                throw new HttpResponseExceptionHelper(401, "Unauthorized");
+                throw new HttpResponseExceptionHelper(403, "Unauthorized access");
+
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
             }
         }
 
