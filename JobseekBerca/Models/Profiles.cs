@@ -20,6 +20,7 @@ namespace JobseekBerca.Models
         public string? address { get; set; }
         public string? phoneNumber { get; set; }
         public DateTime? birthDate { get; set; }
+        public string? profileImage { get; set; }
         [JsonIgnore]
         public virtual Users? Users { get; set; }
 

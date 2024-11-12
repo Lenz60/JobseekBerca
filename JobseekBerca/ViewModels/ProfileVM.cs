@@ -17,6 +17,7 @@ namespace JobseekBerca.ViewModels
         {
             public string? fullName { get; set; }
             public string? summary { get; set; }
+            public string? phoneNumber { get; set; }
             public Gender? gender { get; set; }
             public string? address { get; set; }
             public DateTime? birthDate { get; set; }
@@ -27,6 +28,7 @@ namespace JobseekBerca.ViewModels
             public string? userId { get; set; }
             public string? fullName { get; set; }
             public string? summary { get; set; }
+            public string? phoneNumber { get; set; }
             public Gender? gender { get; set; }
             public string? address { get; set; }
             public DateTime? birthDate { get; set; }
