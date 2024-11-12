@@ -26,7 +26,7 @@ namespace JobseekBerca.Helper
                 claims: new[]
                 {
                     new System.Security.Claims.Claim("uid", payload.userId),
-                    new System.Security.Claims.Claim("role", payload.roleId),
+                    new System.Security.Claims.Claim("role", payload.roleName),
                     new System.Security.Claims.Claim("email", payload.email),
                 },
                 expires: expires,

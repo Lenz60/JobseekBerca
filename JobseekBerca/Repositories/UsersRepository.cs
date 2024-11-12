@@ -5,6 +5,7 @@ using JobseekBerca.ViewModels;
 using JobseekBerca.Models;
 using static JobseekBerca.ViewModels.UserVM;
 using JobseekBerca.Helper;
+using Microsoft.EntityFrameworkCore;
 
 namespace JobseekBerca.Repositories
 {
@@ -181,10 +182,11 @@ namespace JobseekBerca.Repositories
                 {
                     throw new HttpResponseExceptionHelper(404, "Invalid email");
                 }
-                var payload = _myContext.Users.Select(u => new PayloadVM.GenerateVM
+                var payload = _myContext.Users.Include(r => r.Roles)
+                    .Select(u => new PayloadVM.GenerateVM
                 {
                     userId = u.userId,
-                    roleId = u.roleId,
+                    roleName = u.Roles.roleName,
                     email = u.email
                 }).FirstOrDefault(u => u.email == email);
                 return payload;
