@@ -7,7 +7,7 @@ namespace JobseekBerca.Repositories.Interfaces
         IEnumerable<Jobs> GetAllJobs();
         Jobs GetJobById(string jobId);
         int UpdateJobs(Jobs jobs);
-        int DeleteJobs(string jobId);
+        int DeleteJobs(string userId, string jobId);
         int AddJobs(Jobs jobs);
     }
 }
