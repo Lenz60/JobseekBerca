@@ -25,21 +25,28 @@ namespace JobseekBerca.Repositories
             try
             {
                 CheckUserId(userId);
+                var checkRole = _myContext.Users
+                    .Where(x => x.userId == userId)
+                    .Select(u => u.roleId).FirstOrDefault();
                 var profile = _myContext.Profiles.Find(userId);
                 if (profile == null)
                 {
                     throw new HttpResponseExceptionHelper(404, "Profile not found");
                 }
-                var getProfile = new ProfileVM.GetVM
+                if (checkRole == "R03" && profile.userId == userId)
                 {
-                    fullName = profile.fullName,
-                    summary = profile.summary,
-                    phoneNumber = profile.phoneNumber,
-                    gender = profile.gender,
-                    address = profile.address,
-                    birthDate = profile.birthDate
-                };
-                return getProfile;
+                    var getProfile = new ProfileVM.GetVM
+                    {
+                        fullName = profile.fullName,
+                        summary = profile.summary,
+                        phoneNumber = profile.phoneNumber,
+                        gender = profile.gender,
+                        address = profile.address,
+                        birthDate = profile.birthDate
+                    };
+                    return getProfile;
+                }
+                throw new HttpResponseExceptionHelper(403, "Unauthorized access");
             }
             catch (HttpResponseExceptionHelper e)
             {
