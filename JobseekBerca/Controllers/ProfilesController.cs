@@ -2,6 +2,8 @@
 using JobseekBerca.Models;
 using JobseekBerca.Repositories;
 using JobseekBerca.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static JobseekBerca.ViewModels.ProfileVM;
@@ -10,6 +12,8 @@ namespace JobseekBerca.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("AllowSpecificOrigin")]
+    [Authorize(Roles = "User")]
     public class ProfilesController : ControllerBase
     {
         private readonly ProfilesRepository _profilesRepository;
@@ -19,7 +23,8 @@ namespace JobseekBerca.Controllers
             _profilesRepository = profilesRepository;
         }
 
-        [HttpPost("GetById")]
+        [Authorize(Roles = "User")]
+        [HttpGet]
         public IActionResult Get(string userId)
         {
             //var nullableFields = new HashSet<string> { "credentialId", "credentialLink", "description" };

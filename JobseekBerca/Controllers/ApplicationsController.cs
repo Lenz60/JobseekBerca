@@ -2,6 +2,8 @@ using JobseekBerca.Helper;
 using JobseekBerca.Models;
 using JobseekBerca.Repositories;
 using JobseekBerca.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
@@ -10,6 +12,7 @@ namespace JobseekBerca.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("AllowSpecificOrigin")]
     public class ApplicationsController : ControllerBase
     {
         private ApplicationsRepository _applicationsRepository;
@@ -19,6 +22,7 @@ namespace JobseekBerca.Controllers
             _applicationsRepository = applicationsRepository;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("All")]
         public IActionResult GetAllApplications()
         {
@@ -37,6 +41,8 @@ namespace JobseekBerca.Controllers
                 return ResponseHTTP.CreateResponse(500, e.Message);
             }
         }
+
+        [Authorize(Roles = "User")]
         [HttpGet]
         public IActionResult GetAllApplicationsById(string userId)
         {
@@ -56,6 +62,7 @@ namespace JobseekBerca.Controllers
             }
         }
 
+        [Authorize(Roles = "User")]
         [HttpPost]
         public IActionResult AddApplications(Applications applications)
         {
@@ -80,6 +87,7 @@ namespace JobseekBerca.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         public IActionResult UpdateApplications(Applications applications)
         {

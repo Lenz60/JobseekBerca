@@ -3,6 +3,8 @@ using JobseekBerca.Models;
 using JobseekBerca.Repositories;
 using JobseekBerca.Repositories.Interfaces;
 using JobseekBerca.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,6 +12,8 @@ namespace JobseekBerca.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("AllowSpecificOrigin")]
+    [Authorize(Roles = "User")]
     public class SavedJobsController : ControllerBase
     {
         private readonly SavedJobsRepository _savedJobsRepository;

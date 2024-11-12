@@ -2,6 +2,8 @@
 using JobseekBerca.Models;
 using JobseekBerca.Repositories;
 using JobseekBerca.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
@@ -11,6 +13,8 @@ namespace JobseekBerca.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("AllowSpecificOrigin")]
+    [Authorize(Roles = "Super Admin")]
     public class RolesController : ControllerBase
     {
         private RolesRepository _rolesRepository;

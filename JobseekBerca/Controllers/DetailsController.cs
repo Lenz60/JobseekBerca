@@ -3,6 +3,8 @@ using JobseekBerca.Models;
 using JobseekBerca.Repositories;
 using JobseekBerca.Repositories.Details_Repository;
 using JobseekBerca.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static JobseekBerca.ViewModels.DetailsVM;
@@ -11,6 +13,8 @@ namespace JobseekBerca.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("AllowSpecificOrigin")]
+    [Authorize(Roles = "User")]
     public class DetailsController : ControllerBase
     {
         public readonly CertificatesRepository _certificateRepository;
