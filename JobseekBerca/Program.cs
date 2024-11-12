@@ -25,6 +25,12 @@ builder.Services.AddScoped<ApplicationsRepository>();
 builder.Services.AddScoped<SocialMediaRepository>();
 builder.Services.AddScoped<SavedJobsRepository>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin", options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+}); // Make sure you call this previous to AddMvc
+
+
 
 
 var app = builder.Build();
@@ -37,6 +43,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCors("AllowSpecificOrigin");
 
 app.UseHttpsRedirection();
 

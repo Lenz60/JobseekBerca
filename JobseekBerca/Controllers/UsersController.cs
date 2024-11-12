@@ -12,6 +12,7 @@ namespace JobseekBerca.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("AllowSpecificOrigin")]
     public class UsersController : ControllerBase
     {
         private UsersRepository _usersRepository;
