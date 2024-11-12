@@ -8,7 +8,7 @@ namespace JobseekBerca.Models
     {
         [Key]
         public int certificateId { get; set; }
-        public string certificateName { get; set; }
+        public string title { get; set; }
         public string credentialId { get; set; }
         public string credentialLink { get; set; }
         public string description { get; set; }
