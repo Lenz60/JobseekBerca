@@ -38,7 +38,7 @@ namespace JobseekBerca.Helper
             return tokenResult;
         }
 
-        public static string ValidateToken(string token, IConfiguration config)
+        public static bool ValidateToken(string token, IConfiguration config)
         {
             IJsonSerializer serializer = new JsonNetSerializer();
             IDateTimeProvider provider = new UtcDateTimeProvider();
@@ -49,9 +49,29 @@ namespace JobseekBerca.Helper
             var key = config["Jwt:Key"];
 
             var payload = decoder.Decode(token, key, verify: true);
+            if (payload != null){
+                return true;
+            }
+            return false;
 
            
+            //return payload;
+        }
+        
+        public static string Decode(string token, IConfiguration config)
+        {
+            IJsonSerializer serializer = new JsonNetSerializer();
+            IDateTimeProvider provider = new UtcDateTimeProvider();
+            IJwtValidator validator = new JwtValidator(serializer, provider);
+            IBase64UrlEncoder urlEncoder = new JwtBase64UrlEncoder();
+            IJwtAlgorithm algorithm = new HMACSHA256Algorithm();
+            IJwtDecoder decoder = new JwtDecoder(serializer, validator, urlEncoder, algorithm);
+            var key = config["Jwt:Key"];
+
+            var payload = decoder.Decode(token, key, verify: true);
             return payload;
         }
+
+        
     }
 }
