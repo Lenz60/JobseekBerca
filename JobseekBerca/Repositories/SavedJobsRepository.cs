@@ -87,7 +87,7 @@ namespace JobseekBerca.Repositories
                 if (checkRole == "R03")
                 {
                     var savedJob = _myContext.SavedJobs
-                        .Where(sj => sj.userId == deleteVM.userId && sj.savedJobId == deleteVM.savedJobId)
+                        .Where(sj => sj.userId == deleteVM.userId && sj.jobId == deleteVM.jobId)
                         .FirstOrDefault();
 
                     if (savedJob == null)
