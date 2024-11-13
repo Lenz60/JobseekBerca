@@ -140,6 +140,7 @@ namespace JobseekBerca.Repositories
                     .Where(aj => aj.userId == userId)
                     .Select(aj => new ApplicationsVM.UserApplicationsVM
                     {
+                        jobId = aj.jobId,
                         jobTitle = aj.Jobs.title,
                         jobType = aj.Jobs.type,
                         jobLocation = aj.Jobs.location,

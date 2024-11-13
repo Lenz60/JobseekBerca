@@ -7,6 +7,7 @@ namespace JobseekBerca.ViewModels
     {
         public class UserApplicationsVM
         {
+            public string jobId { get; set; }
             public string jobTitle { get; set; }
             public string jobType { get; set; }
             public string jobLocation { get; set; }
