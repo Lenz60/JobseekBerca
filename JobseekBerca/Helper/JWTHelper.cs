@@ -18,7 +18,7 @@ namespace JobseekBerca.Helper
             var secret = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(config["Jwt:Key"]));
             var key = new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
             var issuedAt = DateTime.UtcNow;
-            var expires = issuedAt.AddHours(1); // Token expires in 1 hour
+            var expires = issuedAt.AddHours(24); // Token expires in 1 hour
 
             var token = new JwtSecurityToken(
                 issuer: config["Jwt:Issuer"],
