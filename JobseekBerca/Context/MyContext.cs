@@ -20,6 +20,7 @@ namespace JobseekBerca.Context
         public DbSet<Certificates> Certificates { get; set; }
         public DbSet<SocialMedias> SocialMedias { get; set; }
         public DbSet<SavedJobs> SavedJobs { get; set; }
+        public DbSet<UsersGoogle> UsersGoogle { get; set; }
 
         // Seed the Roles table with pre made roles data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
