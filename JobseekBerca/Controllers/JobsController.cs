@@ -2,6 +2,7 @@ using JobseekBerca.Helper;
 using JobseekBerca.Models;
 using JobseekBerca.Repositories;
 using JobseekBerca.Repositories.Interfaces;
+using JobseekBerca.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
@@ -87,11 +88,11 @@ namespace JobseekBerca.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpDelete]
-        public IActionResult DeleteJobs(string userId, string jobId)
+        public IActionResult DeleteJobs(JobVM.DeleteJobVM deleteVM)
         {
             try
             {
-                _jobsRepository.DeleteJobs(userId, jobId);
+                _jobsRepository.DeleteJobs(deleteVM.userId, deleteVM.jobId);
                 return ResponseHTTP.CreateResponse(200, "Success deleted job.");
 
             }

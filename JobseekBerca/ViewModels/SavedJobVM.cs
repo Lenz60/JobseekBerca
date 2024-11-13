@@ -7,7 +7,7 @@
             public string userId { get; set; }
             public string jobId { get; set; }
         }
-        public class DeleteJobVM
+        public class DeleteSavedJobVM
         {
             public string userId { get; set; }
             public string jobId { get; set; }

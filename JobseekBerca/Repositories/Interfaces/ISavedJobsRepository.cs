@@ -7,6 +7,6 @@ namespace JobseekBerca.Repositories.Interfaces
     {
         public IEnumerable<SavedJobs> GetSavedJobs(string userId);
         public int CreateSavedJob(string userId, string jobId);
-        public int DeleteSavedJob(SavedJobVM.DeleteJobVM deleteVM);
+        public int DeleteSavedJob(SavedJobVM.DeleteSavedJobVM deleteVM);
     }
 }
