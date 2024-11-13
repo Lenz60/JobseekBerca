@@ -1,6 +1,7 @@
 ﻿using JobseekBerca.Helper;
 using JobseekBerca.ViewModels;
 using JWT.Exceptions;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static JobseekBerca.ViewModels.UserVM;
@@ -9,6 +10,7 @@ namespace JobseekBerca.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("AllowSpecificOrigin")]
     public class SessionsController : ControllerBase
     {
         public readonly IConfiguration _config;
