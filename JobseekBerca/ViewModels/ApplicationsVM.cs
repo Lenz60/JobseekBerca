@@ -13,6 +13,8 @@ namespace JobseekBerca.ViewModels
             public string jobLocation { get; set; }
             public string jobRequirement { get; set; }
             public string jobSalary { get; set; }
+            public string jobStastus { get; set; }
+
         }
     }
 }

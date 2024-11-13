@@ -146,6 +146,7 @@ namespace JobseekBerca.Repositories
                         jobLocation = aj.Jobs.location,
                         jobRequirement = aj.Jobs.requirement,
                         jobSalary = aj.Jobs.salary,
+                        jobStastus = aj.status.ToString(),
                     }).ToList();
                 if (applications == null)
                 {
