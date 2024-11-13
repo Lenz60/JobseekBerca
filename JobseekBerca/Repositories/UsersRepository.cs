@@ -184,11 +184,11 @@ namespace JobseekBerca.Repositories
                 }
                 var payload = _myContext.Users.Include(r => r.Roles)
                     .Select(u => new PayloadVM.GenerateVM
-                {
-                    userId = u.userId,
-                    roleName = u.Roles.roleName,
-                    email = u.email
-                }).FirstOrDefault(u => u.email == email);
+                    {
+                        userId = u.userId,
+                        roleName = u.Roles.roleName,
+                        email = u.email
+                    }).FirstOrDefault(u => u.email == email);
                 return payload;
             }
             catch (HttpResponseExceptionHelper e)
@@ -206,6 +206,86 @@ namespace JobseekBerca.Repositories
             try
             {
                 return JWTHelper.GenerateToken(payload, _config);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
+            }
+        }
+
+        public int RegisterGoogle(RegisterGoogleVM registervm)
+        {
+            try
+            {
+                string hashedPassword = HashingHelper.HashPassword(registervm.password);
+                var newUser = new Users
+                {
+                    userId = ULIDHelper.GenerateULID(),
+                    email = registervm.email,
+                    roleId = "R03",
+                    password = hashedPassword,
+                };
+
+                var newProfile = new Profiles
+                {
+                    userId = newUser.userId,
+                    fullName = $"{registervm.firstName} {registervm.lastName}",
+                    summary = $"Hello my name is {registervm.firstName} {registervm.lastName} and I'm eager to learn",
+                    gender = null,
+                    address = null,
+                    birthDate = null,
+                    profileImage = registervm.profileImage
+                };
+
+                var newGoogle = new UsersGoogle
+                {
+                    userId = newUser.userId,
+                    email = newUser.email,
+                    oauthId = registervm.oauthId
+                };
+
+
+                _myContext.Users.Add(newUser);
+                _myContext.UsersGoogle.Add(newGoogle);
+                _myContext.Profiles.Add(newProfile);
+                return _myContext.SaveChanges();
+
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
+            }
+        }
+
+        public int LoginGoogle(LoginGoogleVM login)
+        {
+            try
+            {
+                //var user = _myContext.Users
+                //    .FirstOrDefault(a => a.email == login.email);
+                //Check for user email and oauthId by including Users andUsersGoogle table 
+                var user = _myContext.UsersGoogle.Include(u => u.Users)
+                    .FirstOrDefault(a => a.Users.email == login.email && a.oauthId == login.oauthId);
+
+                if (user == null)
+                {
+                    throw new HttpResponseExceptionHelper(404, "Email is not registered");
+                }
+                //bool isValid = HashingHelper.ValidatePassword(login.password, user.password);
+                //if (isValid)
+                //{
+                
+                return SUCCESS;
+                //}
+                //throw new HttpResponseExceptionHelper(400, "Wrong password");
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
             }
             catch (Exception e)
             {

@@ -49,6 +49,31 @@ namespace JobseekBerca.Controllers
             }
         }
 
+        [HttpPost("registerGoogle")]
+        public IActionResult RegisterGoogle(UserVM.RegisterGoogleVM registerVM)
+        {
+            if (Whitespace.HasNullOrEmptyStringProperties(registerVM, out string propertyName))
+            {
+                return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
+            }
+            var checkEmail = _usersRepository.CheckEmail(registerVM.email);
+
+            if (checkEmail)
+            {
+                return ResponseHTTP.CreateResponse(409, "Email has been used");
+            }
+            var data = _usersRepository.RegisterGoogle(registerVM);
+
+            if (data > 0)
+            {
+                return ResponseHTTP.CreateResponse(200, "Success add new user.", registerVM);
+            }
+            else
+            {
+                return ResponseHTTP.CreateResponse(400, "Fail to add new user.");
+            }
+        }
+
         [HttpPost("login")]
         public IActionResult Login(UserVM.LoginVM login)
         {
@@ -60,6 +85,32 @@ namespace JobseekBerca.Controllers
             try
             {
                 var account = _usersRepository.Login(login);
+                var creds = _usersRepository.GetCredsByEmail(login.email);
+                var token = _usersRepository.GenerateToken(creds);
+                return ResponseHTTP.CreateResponse(200, "Login successful", token);
+
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
+            }
+        }
+        
+        [HttpPost("loginGoogle")]
+        public IActionResult LoginGoogle(UserVM.LoginGoogleVM login)
+        {
+            if (Whitespace.HasNullOrEmptyStringProperties(login, out string propertyName))
+            {
+                return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
+            }
+
+            try
+            {
+                var account = _usersRepository.LoginGoogle(login);
                 var creds = _usersRepository.GetCredsByEmail(login.email);
                 var token = _usersRepository.GenerateToken(creds);
                 return ResponseHTTP.CreateResponse(200, "Login successful", token);
