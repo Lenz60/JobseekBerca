@@ -59,7 +59,7 @@ namespace JobseekBerca.Controllers
         }
 
         [HttpDelete]
-        public IActionResult DeleteSavedJob([FromBody] SavedJobVM.DeleteJobVM savedJob)
+        public IActionResult DeleteSavedJob([FromBody] SavedJobVM.DeleteSavedJobVM savedJob)
         {
             try
             {

@@ -69,7 +69,7 @@ namespace JobseekBerca.Repositories
             }
         }
 
-        public int DeleteSavedJob(SavedJobVM.DeleteJobVM deleteVM)
+        public int DeleteSavedJob(SavedJobVM.DeleteSavedJobVM deleteVM)
         {
             var check = CheckUserId(deleteVM.userId);
             if (check == FAIL)
