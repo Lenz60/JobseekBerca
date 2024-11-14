@@ -22,7 +22,7 @@ namespace JobseekBerca.Controllers
             _applicationsRepository = applicationsRepository;
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "User")]
         [HttpGet("All")]
         public IActionResult GetAllApplications()
         {
