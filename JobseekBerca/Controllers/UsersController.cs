@@ -126,6 +126,7 @@ namespace JobseekBerca.Controllers
             }
         }
 
+        [Authorize(Roles = "User")]
         [HttpPut("changePassword")]
         public IActionResult ChangePassword(UserVM.ChangePasswordVM changePasswordVM)
         {
