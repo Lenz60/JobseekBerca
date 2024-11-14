@@ -14,6 +14,7 @@ namespace JobseekBerca.ViewModels
             public string jobRequirement { get; set; }
             public string jobSalary { get; set; }
             public string jobStastus { get; set; }
+            public string applyDate {  get; set; }
 
         }
     }

@@ -12,8 +12,10 @@ namespace JobseekBerca.Models
         public string? description { get; set; }
         public string? type { get; set; }
         public string? salary { get; set; }
-        public string? requirement { get; set; } 
+        public string? requirement { get; set; }
         public string? location { get; set; }
+        public DateTime? postDate { get; set; }
+
 
 
         [JsonIgnore]

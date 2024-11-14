@@ -15,6 +15,7 @@ namespace JobseekBerca.Models
         [Key]
         public string? applicationId { get; set; }
         public Status status { get; set; }
+        public DateTime? applyDate { get; set; }
 
         [JsonIgnore]
         public virtual Jobs? Jobs { get; set; }
