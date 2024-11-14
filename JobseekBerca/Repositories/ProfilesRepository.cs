@@ -42,7 +42,8 @@ namespace JobseekBerca.Repositories
                         phoneNumber = profile.phoneNumber,
                         gender = profile.gender,
                         address = profile.address,
-                        birthDate = profile.birthDate
+                        birthDate = profile.birthDate,
+                        profileImage = profile.profileImage
                     };
                     return getProfile;
                 }
