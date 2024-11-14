@@ -8,6 +8,6 @@ namespace JobseekBerca.ViewModels
         {
             public string userId { get; set; }
             public string jobId { get; set; }
-        }
+        }         
     }
 }

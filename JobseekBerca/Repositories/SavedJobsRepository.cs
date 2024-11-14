@@ -105,7 +105,7 @@ namespace JobseekBerca.Repositories
             }
         }
 
-        public IEnumerable<SavedJobs> GetSavedJobs(string userId)
+        public IEnumerable<SavedJobVM.GetSaveJob> GetSavedJobs(string userId)
         {
             var check = CheckUserId(userId);
             if (check == FAIL)
@@ -116,15 +116,19 @@ namespace JobseekBerca.Repositories
             }
             else
             {
-                var savedJobs = _myContext.SavedJobs.Select(SavedJob => new SavedJobs
+                var savedJobs = _myContext.SavedJobs
+                .Where(x => x.userId == userId)
+                .Select(savedJob => new SavedJobVM.GetSaveJob
                 {
-                    savedJobId = SavedJob.savedJobId,
-                    Job = SavedJob.Job,
-                    jobId = SavedJob.jobId,
-                    User = SavedJob.User,
-                    userId = SavedJob.userId
-                }).Where(x => x.userId == userId).ToList();
-                if (savedJobs == null)
+                    jobId = savedJob.Job.jobId,
+                    jobTitle = savedJob.Job.title,
+                    jobType = savedJob.Job.type,
+                    jobLocation = savedJob.Job.location,
+                    jobRequirement = savedJob.Job.requirement,
+                    jobSalary = savedJob.Job.salary
+                }).ToList();
+
+                if (savedJobs == null || !savedJobs.Any())
                 {
                     //return null;
                     //throw new Exception("No saved jobs found");
