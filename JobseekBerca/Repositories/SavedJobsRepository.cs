@@ -128,12 +128,12 @@ namespace JobseekBerca.Repositories
                     jobSalary = savedJob.Job.salary
                 }).ToList();
 
-                if (savedJobs == null || !savedJobs.Any())
-                {
-                    //return null;
-                    //throw new Exception("No saved jobs found");
-                    throw new HttpResponseExceptionHelper(401, "No saved jobs found");
-                }
+                //if (savedJobs == null || !savedJobs.Any())
+                //{
+                //    //return null;
+                //    //throw new Exception("No saved jobs found");
+                //    throw new HttpResponseExceptionHelper(401, "No saved jobs found");
+                //}
                 return savedJobs;
             }
 
