@@ -124,7 +124,10 @@ namespace JobseekBerca.Repositories
                     phoneNumber = update.phoneNumber,
                     gender = update.gender,
                     address = update.address,
-                    birthDate = update.birthDate
+                    birthDate = update.birthDate,
+                    linkPersonalWebsite = update.linkPersonalWebsite,
+                    linkGithub  = update.linkGithub,
+                    profileImage = update.profileImage
                 };
                 _myContext.Entry(profile).State = EntityState.Detached;
                 _myContext.Entry(newProfile).State = EntityState.Modified;
