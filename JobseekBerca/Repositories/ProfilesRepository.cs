@@ -37,6 +37,7 @@ namespace JobseekBerca.Repositories
                 {
                     var getProfile = new ProfileVM.GetVM
                     {
+                        userId = userId,
                         fullName = profile.fullName,
                         summary = profile.summary,
                         phoneNumber = profile.phoneNumber,
@@ -109,7 +110,7 @@ namespace JobseekBerca.Repositories
             }
         }
 
-        public int UpdateProfile(UpdateVM update)
+        public int UpdateProfile(ProfileVM.UpdateVM update)
         {
             try
             {
