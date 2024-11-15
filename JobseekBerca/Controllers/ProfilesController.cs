@@ -48,7 +48,7 @@ namespace JobseekBerca.Controllers
             }
         }
 
-        [HttpPost("Update")]
+        [HttpPut("Update")]
         public IActionResult Update(ProfileVM.UpdateVM update)
         {
 
