@@ -53,17 +53,18 @@ namespace JobseekBerca.Repositories
                     .Select(u => u.roleId).FirstOrDefault();
                 if (checkRole == "R02")
                 {
-                    var checkId = _myContext.Jobs.OrderByDescending(j => j.jobId).FirstOrDefault();
+                    //var checkId = _myContext.Jobs.OrderByDescending(j => j.jobId).FirstOrDefault();
 
-                    if (checkId != null)
-                    {
-                        int lastId = int.Parse(checkId.jobId.Substring(1));
-                        jobs.jobId = "J" + (lastId + 1).ToString("D2");
-                    }
-                    else
-                    {
-                        jobs.jobId = "J01";
-                    }
+                    //if (checkId != null)
+                    //{
+                    //    int lastId = int.Parse(checkId.jobId.Substring(1));
+                    //    jobs.jobId = "J" + (lastId + 1).ToString("D2");
+                    //}
+                    //else
+                    //{
+                    //    jobs.jobId = "J01";
+                    //}
+                    jobs.jobId = ULIDHelper.GenerateULID();
                     _myContext.Jobs.Add(jobs);
                     return _myContext.SaveChanges();
                 }
