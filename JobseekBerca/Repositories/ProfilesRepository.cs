@@ -33,21 +33,18 @@ namespace JobseekBerca.Repositories
                 {
                     throw new HttpResponseExceptionHelper(404, "Profile not found");
                 }
-                if (checkRole == "R03" && profile.userId == userId)
+                var getProfile = new ProfileVM.GetVM
                 {
-                    var getProfile = new ProfileVM.GetVM
-                    {
-                        fullName = profile.fullName,
-                        summary = profile.summary,
-                        phoneNumber = profile.phoneNumber,
-                        gender = profile.gender,
-                        address = profile.address,
-                        birthDate = profile.birthDate,
-                        profileImage = profile.profileImage
-                    };
-                    return getProfile;
-                }
-                throw new HttpResponseExceptionHelper(403, "Unauthorized access");
+                    fullName = profile.fullName,
+                    summary = profile.summary,
+                    phoneNumber = profile.phoneNumber,
+                    gender = profile.gender,
+                    address = profile.address,
+                    birthDate = profile.birthDate,
+                    profileImage = profile.profileImage
+                };
+                return getProfile;
+                
             }
             catch (HttpResponseExceptionHelper e)
             {
