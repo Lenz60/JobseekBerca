@@ -33,7 +33,7 @@ namespace JobseekBerca.Repositories
                 {
                     throw new HttpResponseExceptionHelper(404, "Profile not found");
                 }
-                if (checkRole == "R03" && profile.userId == userId)
+                var getProfile = new ProfileVM.GetVM
                 {
                     var getProfile = new ProfileVM.GetVM
                     {

@@ -1,5 +1,6 @@
 
 using JobseekBerca.Context;
+using JobseekBerca.Helper;
 using JobseekBerca.Repositories;
 using JobseekBerca.Repositories.Details_Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -28,6 +29,10 @@ builder.Services.AddScoped<SkillsRepository>();
 builder.Services.AddScoped<ApplicationsRepository>();
 builder.Services.AddScoped<SocialMediaRepository>();
 builder.Services.AddScoped<SavedJobsRepository>();
+builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
+builder.Services.AddTransient<SMTPHelper>();
+
+
 
 builder.Services.AddCors(options =>
 {
