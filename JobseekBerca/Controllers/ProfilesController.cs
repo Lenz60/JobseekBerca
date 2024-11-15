@@ -13,7 +13,7 @@ namespace JobseekBerca.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [EnableCors("AllowSpecificOrigin")]
-    [Authorize(Roles = "User")]
+    
     public class ProfilesController : ControllerBase
     {
         private readonly ProfilesRepository _profilesRepository;
@@ -23,7 +23,7 @@ namespace JobseekBerca.Controllers
             _profilesRepository = profilesRepository;
         }
 
-        [Authorize(Roles = "User")]
+        [Authorize]
         [HttpGet]
         public IActionResult Get(string userId)
         {
@@ -48,6 +48,7 @@ namespace JobseekBerca.Controllers
             }
         }
 
+        [Authorize(Roles = "User")]
         [HttpPost("Update")]
         public IActionResult Update(ProfileVM.UpdateVM update)
         {
