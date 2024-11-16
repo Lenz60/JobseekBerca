@@ -3,6 +3,7 @@ using JobseekBerca.Context;
 using JobseekBerca.Helper;
 using JobseekBerca.Repositories;
 using JobseekBerca.Repositories.Details_Repository;
+using JobseekBerca.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -10,6 +11,7 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 // Add services to the container.
 
@@ -31,6 +33,7 @@ builder.Services.AddScoped<SocialMediaRepository>();
 builder.Services.AddScoped<SavedJobsRepository>();
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
 builder.Services.AddTransient<SMTPHelper>();
+
 
 
 
@@ -96,7 +99,7 @@ builder.Services.AddSwaggerGen(c =>
 var app = builder.Build();
 
 
-
+app.UseStaticFiles();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
