@@ -49,7 +49,7 @@ namespace JobseekBerca.Controllers
         }
 
         [Authorize(Roles = "User")]
-        [HttpPost("Update")]
+        [HttpPut("Update")]
         public IActionResult Update(ProfileVM.UpdateVM update)
         {
 
