@@ -2,6 +2,8 @@
 using JobseekBerca.Helper;
 using JobseekBerca.Models;
 using JobseekBerca.Repositories.Interfaces;
+using JobseekBerca.ViewModels;
+using Microsoft.AspNetCore.Server.IIS.Core;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 
@@ -95,6 +97,64 @@ namespace JobseekBerca.Repositories
             catch (HttpResponseExceptionHelper e)
             {
                 throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
+            }
+        }
+
+        public IEnumerable<RoleVM.GetDetailsVM> GetDetailRoles()
+        {
+            try
+            {
+                var data = _myContext.Profiles.Include(u => u.Users.Roles)
+                    .Select(r => new RoleVM.GetDetailsVM
+                    {
+                        userId = r.userId,
+                        userName = r.fullName,
+                        roleName = r.Users.Roles.roleName,
+                        userEmail = r.Users.email
+                    }).ToList();
+                if (data != null)
+                {
+                    return data;
+
+                }
+                throw new HttpResponseExceptionHelper(404, "Data not found");
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
+            }
+        }
+
+        public int ChangeRole(RoleVM.ChangeRoleVM changeVM)
+        {
+            try
+            {
+                var check = _myContext.Users.Find(changeVM.userId);
+                if (check != null)
+                {
+                    var checkRole = _myContext.Roles.Find(changeVM.roleId);
+                    if (checkRole == null)
+                    {
+                        throw new HttpResponseExceptionHelper(404, "Invalid role id");
+                    }
+                    check.roleId = changeVM.roleId;
+                    _myContext.Entry(checkRole).State = EntityState.Detached;
+                    _myContext.Entry(check).State = EntityState.Modified;
+                    return _myContext.SaveChanges();
+                }
+                throw new HttpResponseExceptionHelper(404, "Invalid user id");
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(500, e.Message);
             }
             catch (Exception e)
             {

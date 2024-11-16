@@ -2,6 +2,7 @@
 using JobseekBerca.Models;
 using JobseekBerca.Repositories;
 using JobseekBerca.Repositories.Interfaces;
+using JobseekBerca.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
@@ -43,6 +44,24 @@ namespace JobseekBerca.Controllers
             }
         }
 
+        [HttpGet("Details")]
+        public IActionResult GetDetailRoles()
+        {
+            try
+            {
+                var data = _rolesRepository.GetDetailRoles();
+                return ResponseHTTP.CreateResponse(200, "Roles retrieved successfully.", data);
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
+            }
+        }
+
         [HttpPost]
         public IActionResult AddRoles(Roles roles)
         {
@@ -55,6 +74,25 @@ namespace JobseekBerca.Controllers
                 var addRole = _rolesRepository.AddRole(roles);
                 return ResponseHTTP.CreateResponse(200, "Success add new role", roles);
 
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
+            }
+        }
+
+        [HttpPut("Change")]
+        public IActionResult ChangeRole(RoleVM.ChangeRoleVM changeVM)
+        {
+            
+            try
+            {
+                int result = _rolesRepository.ChangeRole(changeVM);
+                return ResponseHTTP.CreateResponse(200, "Success change role.");
             }
             catch (HttpResponseExceptionHelper e)
             {
