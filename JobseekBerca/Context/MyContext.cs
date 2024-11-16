@@ -74,7 +74,7 @@ namespace JobseekBerca.Context
             var adminProfile = new Profiles
             {
                 userId = admin.userId,
-                fullName = "Super Admin",
+                fullName = "Admin",
                 summary = $"Hello I'm a Admin",
                 gender = null,
                 address = null,
