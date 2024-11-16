@@ -10,8 +10,6 @@ namespace JobseekBerca.Models
         S2,
         S3,
         D3,
-        D4,
-        D5
     }
     public class Educations
     {
