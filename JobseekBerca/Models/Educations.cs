@@ -19,7 +19,7 @@ namespace JobseekBerca.Models
         public string programStudy { get; set; }
 
         public Degree degree { get; set; }
-        public string description { get; set; }
+        public string? description { get; set; }
         public float gpa { get; set; }
         public DateTime startDate { get; set; }
         public DateTime? endDate { get; set; }

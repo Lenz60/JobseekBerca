@@ -134,8 +134,7 @@ namespace JobseekBerca.Controllers
         [HttpGet("Educations")]
         public IActionResult GetEducations(string userId)
         {
-            var nullableFields = new HashSet<string> {"description" };
-            if (Whitespace.HasNullOrEmptyStringProperties(userId, out string propertyName, nullableFields))
+            if (Whitespace.HasNullOrEmptyStringProperties(userId, out string propertyName))
             {
                 return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
