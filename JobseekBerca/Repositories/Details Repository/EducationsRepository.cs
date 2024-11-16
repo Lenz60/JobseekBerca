@@ -66,6 +66,7 @@ namespace JobseekBerca.Repositories
                     userId = education.userId,
                     educationId = education.educationId,
                     universityName = education.universityName,
+                    programStudy=education.programStudy,
                     degree = education.degree,
                     description = education.description,
                     gpa = education.gpa,
