@@ -13,7 +13,7 @@ namespace JobseekBerca.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [EnableCors("AllowSpecificOrigin")]
-    [Authorize(Roles = "User")]
+    
     public class ProfilesController : ControllerBase
     {
         private readonly ProfilesRepository _profilesRepository;
@@ -23,7 +23,7 @@ namespace JobseekBerca.Controllers
             _profilesRepository = profilesRepository;
         }
 
-        [Authorize(Roles = "User")]
+        [Authorize]
         [HttpGet]
         public IActionResult Get(string userId)
         {
@@ -48,7 +48,8 @@ namespace JobseekBerca.Controllers
             }
         }
 
-        [HttpPost("Update")]
+        [Authorize(Roles = "User")]
+        [HttpPut("Update")]
         public IActionResult Update(ProfileVM.UpdateVM update)
         {
 
@@ -64,7 +65,7 @@ namespace JobseekBerca.Controllers
             //{
             //    return ResponseHTTP.CreateResponse(400, "Birth Date is invalid!");
             //}
-            var nullableFields = new HashSet<string> { "summary", "address" };
+            var nullableFields = new HashSet<string> { "summary", "address", "linkPersonalWebsite", "profileImage", "linkGithub" };
             if (Whitespace.HasNullOrEmptyStringProperties(update, out string propertyName, nullableFields))
             {
                 return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");

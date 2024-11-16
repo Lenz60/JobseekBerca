@@ -27,27 +27,28 @@ namespace JobseekBerca.Repositories
                 CheckUserId(userId);
                 var checkRole = _myContext.Users
                     .Where(x => x.userId == userId)
-                    .Select(u => u.roleId).FirstOrDefault();
+                    .Select(u => u.roleId)
+                    .FirstOrDefault();
+
                 var profile = _myContext.Profiles.Find(userId);
                 if (profile == null)
                 {
                     throw new HttpResponseExceptionHelper(404, "Profile not found");
                 }
-                if (checkRole == "R03" && profile.userId == userId)
+
+                var getProfile = new ProfileVM.GetVM
                 {
-                    var getProfile = new ProfileVM.GetVM
-                    {
-                        fullName = profile.fullName,
-                        summary = profile.summary,
-                        phoneNumber = profile.phoneNumber,
-                        gender = profile.gender,
-                        address = profile.address,
-                        birthDate = profile.birthDate,
-                        profileImage = profile.profileImage
-                    };
-                    return getProfile;
-                }
-                throw new HttpResponseExceptionHelper(403, "Unauthorized access");
+                    userId = userId,
+                    fullName = profile.fullName,
+                    summary = profile.summary,
+                    phoneNumber = profile.phoneNumber,
+                    gender = profile.gender,
+                    address = profile.address,
+                    birthDate = profile.birthDate,
+                    profileImage = profile.profileImage
+                };
+
+                return getProfile;
             }
             catch (HttpResponseExceptionHelper e)
             {
@@ -58,6 +59,7 @@ namespace JobseekBerca.Repositories
                 throw new HttpResponseExceptionHelper(500, e.Message);
             }
         }
+
 
         public int CreateProfile(ProfileVM.CreateVM create)
         {
@@ -109,7 +111,7 @@ namespace JobseekBerca.Repositories
             }
         }
 
-        public int UpdateProfile(UpdateVM update)
+        public int UpdateProfile(ProfileVM.UpdateVM update)
         {
             try
             {
@@ -127,7 +129,10 @@ namespace JobseekBerca.Repositories
                     phoneNumber = update.phoneNumber,
                     gender = update.gender,
                     address = update.address,
-                    birthDate = update.birthDate
+                    birthDate = update.birthDate,
+                    linkPersonalWebsite = update.linkPersonalWebsite,
+                    linkGithub  = update.linkGithub,
+                    profileImage = update.profileImage
                 };
                 _myContext.Entry(profile).State = EntityState.Detached;
                 _myContext.Entry(newProfile).State = EntityState.Modified;

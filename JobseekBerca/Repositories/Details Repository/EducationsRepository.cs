@@ -66,6 +66,7 @@ namespace JobseekBerca.Repositories
                     userId = education.userId,
                     educationId = education.educationId,
                     universityName = education.universityName,
+                    programStudy=education.programStudy,
                     degree = education.degree,
                     description = education.description,
                     gpa = education.gpa,
@@ -116,17 +117,10 @@ namespace JobseekBerca.Repositories
             try
             {
                 CheckUserId(userId);
-                var educations = _myContext.Educations.Select(Educations => new Educations
-                {
-                    userId = Educations.userId,
-                    educationId = Educations.educationId,
-                    universityName = Educations.universityName,
-                    degree = Educations.degree,
-                    description = Educations.description,
-                    gpa = Educations.gpa,
-                    startDate = Educations.startDate,
-                    endDate = Educations.endDate
-                }).Where(x => x.userId == userId).ToList();
+                var educations = _myContext.Educations
+                 .Where(x => x.userId == userId)
+                 .ToList();
+
                 if (educations == null)
                 {
                     //return null;

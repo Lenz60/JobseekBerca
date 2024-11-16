@@ -6,6 +6,7 @@ using JobseekBerca.Models;
 using static JobseekBerca.ViewModels.UserVM;
 using JobseekBerca.Helper;
 using Microsoft.EntityFrameworkCore;
+using JobseekBerca.Helper.Interface;
 
 namespace JobseekBerca.Repositories
 {
@@ -13,10 +14,12 @@ namespace JobseekBerca.Repositories
     {
         private readonly MyContext _myContext;
         private readonly IConfiguration _config;
-        public UsersRepository(MyContext myContext, IConfiguration config)
+        private readonly SMTPHelper _smtpHelper;
+        public UsersRepository(MyContext myContext, IConfiguration config, SMTPHelper smtpHelper)
         {
             _myContext = myContext;
             _config = config;
+            _smtpHelper = smtpHelper;
         }
         public const int ACCOUNT_NOT_FOUND = -2;
         public const int INVALID_PASSWORD = -1;
@@ -237,6 +240,7 @@ namespace JobseekBerca.Repositories
                     profileImage = registervm.profileImage
                 };
 
+                //Check first on Users Google, if there is no email given by parameter , then create , if not then login
                 var newGoogle = new UsersGoogle
                 {
                     userId = newUser.userId,
@@ -244,6 +248,64 @@ namespace JobseekBerca.Repositories
                     oauthId = registervm.oauthId
                 };
 
+                //Sent password to email
+                var toEmail = newUser.email;
+                var subject = "Change your password";
+                var body = $@"
+                            <html>
+                            <head>
+                                <style>
+                                    body {{
+                                        font-family: Arial, sans-serif;
+                                        background-color: #f4f4f9;
+                                        margin: 0;
+                                        padding: 0;
+                                    }}
+                                    .container {{
+                                        width: 100%;
+                                        padding: 20px;
+                                        background-color: #ffffff;
+                                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                                        margin: 20px auto;
+                                        max-width: 600px;
+                                    }}
+                                    .header {{
+                                        background-color: #0A4D80;
+                                        color: white;
+                                        padding: 10px 0;
+                                        text-align: center;
+                                    }}
+                                    .content {{
+                                        padding: 20px;
+                                    }}
+                                    .footer {{
+                                        text-align: center;
+                                        padding: 10px;
+                                        font-size: 12px;
+                                        color: #888;
+                                    }}
+                                </style>
+                            </head>
+                            <body>
+                                <div class='container'>
+                                    <div class='header'>
+                                        <h1>Welcome to BerCareer!</h1>
+                                    </div>
+                                    <div class='content'>
+                                        <h2>Thank you for registering!</h2>
+                                        <p>Here is your password: <strong>{registervm.password}</strong></p>
+                                        <p>Please change it from the profile page of our site.</p>
+                                        <p>Thank you!</p>
+                                    </div>
+                                    <div class='footer'>
+                                        <p>&copy; 2024 BerCareer. All rights reserved.</p>
+                                    </div>
+                                </div>
+                            </body>
+                            </html>";
+                
+                _smtpHelper.SendEmail(toEmail, subject, body);
+                //SMTPHelper.SendEmail(toEmail, subject, body);
 
                 _myContext.Users.Add(newUser);
                 _myContext.UsersGoogle.Add(newGoogle);
@@ -278,7 +340,7 @@ namespace JobseekBerca.Repositories
                 //bool isValid = HashingHelper.ValidatePassword(login.password, user.password);
                 //if (isValid)
                 //{
-                
+
                 return SUCCESS;
                 //}
                 //throw new HttpResponseExceptionHelper(400, "Wrong password");

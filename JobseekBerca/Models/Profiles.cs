@@ -21,6 +21,8 @@ namespace JobseekBerca.Models
         public string? phoneNumber { get; set; }
         public DateTime? birthDate { get; set; }
         public string? profileImage { get; set; }
+        public string? linkPersonalWebsite { get; set; }
+        public string? linkGithub { get; set; }
         [JsonIgnore]
         public virtual Users? Users { get; set; }
 

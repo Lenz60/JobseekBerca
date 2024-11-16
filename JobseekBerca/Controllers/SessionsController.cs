@@ -21,15 +21,15 @@ namespace JobseekBerca.Controllers
         }
 
         [HttpPost("Validate")]
-        public IActionResult Validate([FromBody] PayloadVM.ValidateVM validateVM)
+        public IActionResult Validate(PayloadVM.ValidateVM validateVM)
         {
+            if (Whitespace.HasNullOrEmptyStringProperties(validateVM, out string propertyName))
+            {
+                return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
+            }
             try
             {
                 var token = validateVM.token;
-                if (Whitespace.HasNullOrEmptyStringProperties(token, out string propertyName))
-                {
-                    return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
-                }
                 //HttpContext.Session.SetString("JWT", token);
                 var payloadList = JWTHelper.Decode(token, _config);
                 return ResponseHTTP.CreateResponse(200, payloadList);
@@ -48,13 +48,11 @@ namespace JobseekBerca.Controllers
             }
             catch (SignatureVerificationException e)
             {
-                //return Unauthorized(new
-                //{
-                //    statusCode = StatusCodes.Status403Forbidden,
-                //    message = "Signature changed or invalid",
-                //    data = null as object,
-                //});
                 return ResponseHTTP.CreateResponse(401, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
             }
         }
     }
