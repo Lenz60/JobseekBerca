@@ -27,28 +27,28 @@ namespace JobseekBerca.Repositories
                 CheckUserId(userId);
                 var checkRole = _myContext.Users
                     .Where(x => x.userId == userId)
-                    .Select(u => u.roleId).FirstOrDefault();
+                    .Select(u => u.roleId)
+                    .FirstOrDefault();
+
                 var profile = _myContext.Profiles.Find(userId);
                 if (profile == null)
                 {
                     throw new HttpResponseExceptionHelper(404, "Profile not found");
                 }
+
                 var getProfile = new ProfileVM.GetVM
                 {
-                    var getProfile = new ProfileVM.GetVM
-                    {
-                        userId = userId,
-                        fullName = profile.fullName,
-                        summary = profile.summary,
-                        phoneNumber = profile.phoneNumber,
-                        gender = profile.gender,
-                        address = profile.address,
-                        birthDate = profile.birthDate,
-                        profileImage = profile.profileImage
-                    };
-                    return getProfile;
-                }
-                throw new HttpResponseExceptionHelper(403, "Unauthorized access");
+                    userId = userId,
+                    fullName = profile.fullName,
+                    summary = profile.summary,
+                    phoneNumber = profile.phoneNumber,
+                    gender = profile.gender,
+                    address = profile.address,
+                    birthDate = profile.birthDate,
+                    profileImage = profile.profileImage
+                };
+
+                return getProfile;
             }
             catch (HttpResponseExceptionHelper e)
             {
@@ -59,6 +59,7 @@ namespace JobseekBerca.Repositories
                 throw new HttpResponseExceptionHelper(500, e.Message);
             }
         }
+
 
         public int CreateProfile(ProfileVM.CreateVM create)
         {
