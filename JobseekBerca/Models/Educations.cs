@@ -18,6 +18,8 @@ namespace JobseekBerca.Models
         [Key]
         public int educationId { get; set; }
         public string universityName { get; set; }
+        public string programStudy { get; set; }
+
         public Degree degree { get; set; }
         public string description { get; set; }
         public float gpa { get; set; }
