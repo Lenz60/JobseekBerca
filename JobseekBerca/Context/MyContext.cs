@@ -1,6 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using JobseekBerca.Models;
 using System.Data;
+using JobseekBerca.Helper;
+using static JobseekBerca.ViewModels.UserVM;
+using Microsoft.AspNetCore.Identity;
 
 namespace JobseekBerca.Context
 {
@@ -27,11 +30,62 @@ namespace JobseekBerca.Context
         {
             base.OnModelCreating(modelBuilder);
 
+           
+
+            // Configure cascade delete for Roles
+            modelBuilder.Entity<Users>()
+                .HasOne(u => u.Roles)
+                .WithMany()
+                .HasForeignKey(u => u.roleId)
+                .OnDelete(DeleteBehavior.Cascade);
+            // Seed roles
             modelBuilder.Entity<Roles>().HasData(
                 new Roles { roleId = "R01", roleName = "Super Admin" },
                 new Roles { roleId = "R02", roleName = "Admin" },
                 new Roles { roleId = "R03", roleName = "User" }
             );
+
+            // Seed the users
+            var password = HashingHelper.HashPassword("123");
+            var superAdmin = new Users
+            {
+                userId = ULIDHelper.GenerateULID(),
+                email = "super@email.com",
+                password = password,
+                roleId = "R01"
+            };
+            var superProfile = new Profiles
+            {
+                userId = superAdmin.userId,
+                fullName = "Super Admin",
+                summary = $"Hello I'm a Super Admin",
+                gender = null,
+                address = null,
+                birthDate = null,
+                profileImage = "https://i1.wp.com/www.bulletproofaction.com/wp-content/uploads/2015/09/john-wick.jpg"
+            };
+            var admin = new Users
+            {
+                userId = ULIDHelper.GenerateULID(),
+                email = "admin@email.com",
+                password = password,
+                roleId = "R02"
+            };
+            var adminProfile = new Profiles
+            {
+                userId = admin.userId,
+                fullName = "Super Admin",
+                summary = $"Hello I'm a Admin",
+                gender = null,
+                address = null,
+                birthDate = null,
+                profileImage = "https://www.looper.com/img/gallery/john-wick-chapter-4-caine-is-a-refreshing-take-an-old-action-trope/l-intro-1679619131.jpg"
+            };
+            modelBuilder.Entity<Users>().HasData(superAdmin,admin);
+            modelBuilder.Entity<Profiles>().HasData(superProfile, adminProfile);
+
+            
+            // Cascade delete on the SavedJobs
             modelBuilder.Entity<SavedJobs>()
             .HasOne(sj => sj.Job)
             .WithMany()
