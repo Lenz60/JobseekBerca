@@ -7,6 +7,7 @@ using static JobseekBerca.ViewModels.UserVM;
 using JobseekBerca.Helper;
 using Microsoft.EntityFrameworkCore;
 using JobseekBerca.Helper.Interface;
+using JWT.Exceptions;
 
 namespace JobseekBerca.Repositories
 {
@@ -204,11 +205,135 @@ namespace JobseekBerca.Repositories
             }
         }
 
+        //public string GenerateRefreshToken(string token, PayloadVM.GenerateVM payload)
+        //{
+        //    try
+        //    {
+        //        var check = _myContext.RefreshToken.Find(payload.userId);
+        //        if (check != null)
+        //        {
+        //            var refreshToken = _myContext.RefreshToken.Find(payload.userId);
+        //            try
+        //            {
+        //                JWTHelper.ValidateToken(refreshToken.refreshToken, _config);
+        //                return token;
+        //            }
+        //            catch (TokenExpiredException e)
+        //            {
+        //                var deleteRefreshToken = _myContext.RefreshToken.Remove(refreshToken);
+        //                _myContext.SaveChanges();
+        //                throw new HttpResponseExceptionHelper(401, e.Message);
+        //            }
+        //        }
+        //        else
+        //        {
+        //            var checkUser = _myContext.Users.Find(payload.userId);
+        //            if (checkUser == null)
+        //            {
+        //                throw new HttpResponseExceptionHelper(404, "User id is invalid");
+        //            }
+        //            var refreshPayload = new PayloadVM.RefreshVM
+        //            {
+        //                email = checkUser.email
+        //            };
+        //            try
+        //            {
+        //                var refreshToken = JWTHelper.GenerateRefreshToken(refreshPayload, _config);
+        //                //return generateRefreshToken;
+        //                _myContext.RefreshToken.Add(new RefreshToken
+        //                {
+        //                    userId = payload.userId,
+        //                    refreshToken = refreshToken
+        //                });
+        //                _myContext.SaveChanges();
+        //                return GenerateToken(payload);
+        //            }
+        //            catch (HttpResponseExceptionHelper e)
+        //            {
+        //                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+        //            }
+        //            //return refreshToken;
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        throw new HttpResponseExceptionHelper(500, e.Message);
+        //    }
+        //}
+
+        public bool CreateRefreshToken(string userId)
+        {
+            // Check if the user is valid or not
+            var checkUser = _myContext.Users.Find(userId);
+            if (checkUser == null)
+            {
+                throw new HttpResponseExceptionHelper(404, "User id is invalid");
+            }
+            var refreshPayload = new PayloadVM.RefreshVM
+            {
+                email = checkUser.email
+            };
+            try
+            {
+                // Generate a new refresh token for the user
+                var refreshToken = JWTHelper.GenerateRefreshToken(refreshPayload, _config);
+                // Add the refresh token to the database
+                _myContext.RefreshToken.Add(new RefreshToken
+                {
+                    userId = userId,
+                    refreshToken = refreshToken
+                });
+                _myContext.SaveChanges();
+                return true;
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+        }
+
+        public bool CheckRefreshToken(string userId)
+        {
+            // Check if the user has a refresh token or not
+            var refreshToken = _myContext.RefreshToken.Find(userId);
+            if (refreshToken != null)
+            {
+                try
+                {
+                    // If user has a refresh token, validate the token
+                    var validate = JWTHelper.ValidateToken(refreshToken.refreshToken, _config);
+                    // If the token is valid, return true
+                    return true;
+                }
+                catch (TokenExpiredException e)
+                {
+                    // If the token is expired, delete the token from the database
+                    var deleteRefreshToken = _myContext.RefreshToken.Remove(refreshToken);
+                    _myContext.SaveChanges();
+                    throw new HttpResponseExceptionHelper(401, "Refresh Token is expired");
+                }
+            }
+            else
+            {
+                // If the user doesn't have a refresh token, create a new one
+                return CreateRefreshToken(userId);
+            }
+        }
+
         public string GenerateToken(PayloadVM.GenerateVM payload)
         {
             try
             {
-                return JWTHelper.GenerateToken(payload, _config);
+                // Generate token for user based on the payload
+                var generateToken = JWTHelper.GenerateToken(payload, _config);
+                // Check if the user has a refresh token or not
+                var checkRefreshToken = _myContext.RefreshToken.Find(payload.userId);
+                if (checkRefreshToken == null)
+                {
+                    // If the user doesn't have a refresh token, create a new one
+                    CreateRefreshToken(payload.userId);
+                }
+                return generateToken;
             }
             catch (Exception e)
             {
@@ -303,7 +428,7 @@ namespace JobseekBerca.Repositories
                                 </div>
                             </body>
                             </html>";
-                
+
                 _smtpHelper.SendEmail(toEmail, subject, body);
                 //SMTPHelper.SendEmail(toEmail, subject, body);
 
