@@ -23,6 +23,9 @@ namespace JobseekBerca.ViewModels
             public string? address { get; set; }
             public DateTime? birthDate { get; set; }
             public string? profileImage { get; set; }
+            public string? linkPersoanlWebsite { get; set; }
+            public string? linkGithub { get; set; }
+
 
         }
         public class UpdateVM
