@@ -46,7 +46,7 @@ namespace JobseekBerca.Repositories
                     address = profile.address,
                     birthDate = profile.birthDate,
                     profileImage = profile.profileImage,
-                    linkPersoanlWebsite = profile.linkPersonalWebsite,
+                    linkPersonalWebsite = profile.linkPersonalWebsite,
                     linkGithub = profile.linkGithub,
                 };
 
