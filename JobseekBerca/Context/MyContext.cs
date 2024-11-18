@@ -98,6 +98,18 @@ namespace JobseekBerca.Context
                 .WithMany()
                 .HasForeignKey(sj => sj.userId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Applications>()
+                .HasOne(a => a.Users)
+                .WithMany()
+                .HasForeignKey(a => a.userId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Applications>()
+                .HasOne(a => a.Jobs)
+                .WithMany()
+                .HasForeignKey(a => a.jobId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }
