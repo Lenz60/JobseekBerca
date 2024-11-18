@@ -16,24 +16,31 @@ namespace JobseekBerca.Helper
 
         public void SendEmail(string toEmail, string subject, string body)
         {
-            var smtpClient = new SmtpClient(_smtpSettings.Server)
+            try
             {
-                Port = _smtpSettings.Port,
-                Credentials = new NetworkCredential(_smtpSettings.Username, _smtpSettings.Password),
-                EnableSsl = true,
-            };
+                var smtpClient = new SmtpClient(_smtpSettings.Server)
+                {
+                    Port = _smtpSettings.Port,
+                    Credentials = new NetworkCredential(_smtpSettings.Username, _smtpSettings.Password),
+                    EnableSsl = true,
+                };
 
-            var mailMessage = new MailMessage
+                var mailMessage = new MailMessage
+                {
+                    From = new MailAddress(_smtpSettings.SenderEmail, _smtpSettings.SenderName),
+                    Subject = subject,
+                    Body = body,
+                    IsBodyHtml = true,
+                };
+
+                mailMessage.To.Add(toEmail);
+
+                smtpClient.Send(mailMessage);
+            }
+            catch (HttpResponseExceptionHelper e)
             {
-                From = new MailAddress(_smtpSettings.SenderEmail, _smtpSettings.SenderName),
-                Subject = subject,
-                Body = body,
-                IsBodyHtml = true,
-            };
-
-            mailMessage.To.Add(toEmail);
-
-            smtpClient.Send(mailMessage);
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
         }
     }
 }
