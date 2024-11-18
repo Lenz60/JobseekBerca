@@ -423,5 +423,15 @@ namespace JobseekBerca.Repositories
                 throw new HttpResponseExceptionHelper(500, e.Message);
             }
         }
+
+        public bool CheckGoogleUser(string userId)
+        {
+            var check = _myContext.UsersGoogle.Find(userId);
+            if (check != null)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }
