@@ -22,13 +22,33 @@ namespace JobseekBerca.Controllers
             _applicationsRepository = applicationsRepository;
         }
 
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "User, Admin")]
         [HttpGet("All")]
         public IActionResult GetAllApplications()
         {
             try
             {
                 var applications = _applicationsRepository.GetAllApplications();
+                return ResponseHTTP.CreateResponse(200, "Applications retrieved successfully.", applications);
+
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                return ResponseHTTP.CreateResponse(e.StatusCode, e.Message);
+            }
+            catch (Exception e)
+            {
+                return ResponseHTTP.CreateResponse(500, e.Message);
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("AllDetail")]
+        public IActionResult GetAllApplicationsDetail()
+        {
+            try
+            {
+                var applications = _applicationsRepository.GetAllApplicationsDetail();
                 return ResponseHTTP.CreateResponse(200, "Applications retrieved successfully.", applications);
 
             }
@@ -67,7 +87,7 @@ namespace JobseekBerca.Controllers
         public IActionResult AddApplications(Applications applications)
         {
             var nullableFields = new HashSet<string> { "applicationId" };
-            if (Whitespace.HasNullOrEmptyStringProperties(applications, out string propertyName,nullableFields))
+            if (Whitespace.HasNullOrEmptyStringProperties(applications, out string propertyName, nullableFields))
             {
                 return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
             }
