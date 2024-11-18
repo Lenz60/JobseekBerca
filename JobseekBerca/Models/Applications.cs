@@ -21,6 +21,9 @@ namespace JobseekBerca.Models
         public virtual Jobs? Jobs { get; set; }
         [ForeignKey("Jobs")]
         public string jobId { get; set; }
+        [JsonIgnore]
+        public virtual Users? Users { get; set; }
+        [ForeignKey("Users")]
         public string userId { get; set; }
     }
 }

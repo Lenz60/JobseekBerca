@@ -12,6 +12,8 @@ namespace JobseekBerca.Models
     }
     public class Profiles
     {
+        [JsonIgnore]
+        public virtual Users? Users { get; set; }
         [Key, ForeignKey("Users"), Required]
         public string userId { get; set; }
         public string? fullName { get; set; }
@@ -23,8 +25,11 @@ namespace JobseekBerca.Models
         public string? profileImage { get; set; }
         public string? linkPersonalWebsite { get; set; }
         public string? linkGithub { get; set; }
-        [JsonIgnore]
-        public virtual Users? Users { get; set; }
+        public virtual ICollection<Experiences> Experiences { get; set; } = new List<Experiences>();
+        public virtual ICollection<Educations> Educations { get; set; } = new List<Educations>();
+        public virtual ICollection<Skills> Skills { get; set; } = new List<Skills>();
+
+
 
     }
 }

@@ -14,5 +14,6 @@ namespace JobseekBerca.Models
         public virtual Roles? Roles { get; set; }
         [ForeignKey("Roles")]
         public string roleId { get; set; }
+        public virtual Profiles? Profiles { get; set; }
     }
 }

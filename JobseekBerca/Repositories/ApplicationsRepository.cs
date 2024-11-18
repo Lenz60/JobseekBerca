@@ -5,6 +5,7 @@ using JobseekBerca.ViewModels;
 using JobseekBerca.Models;
 using JobseekBerca.Helper;
 using Microsoft.EntityFrameworkCore;
+using static JobseekBerca.ViewModels.ApplicationsVM;
 
 namespace JobseekBerca.Repositories
 {
@@ -46,6 +47,43 @@ namespace JobseekBerca.Repositories
                 throw new HttpResponseExceptionHelper(500, e.Message);
             }
         }
+
+        public IEnumerable<ApllicationsDetailVM> GetAllApplicationsDetail()
+        {
+            return _myContext.Applications
+                .Include(app => app.Jobs)
+                .ThenInclude(job => job.Users.Profiles)
+                .ThenInclude(profile => profile.Experiences)
+                .Include(app => app.Users.Profiles.Educations)
+                .Include(app => app.Users.Profiles.Skills)
+                .Select(app => new
+                {
+                    UserId = app.Users.userId,
+                    JobId = app.Jobs.jobId,
+                    JobTitle = app.Jobs.title,
+                    FullName = app.Users.Profiles.fullName,
+                    Experiences = app.Users.Profiles.Experiences.Select(e => e.position),
+                    Educations = app.Users.Profiles.Educations.Select(e => e.universityName),
+                    Skills = app.Users.Profiles.Skills.Select(s => s.skillName),
+                    PersonalWebsite = app.Users.Profiles.linkPersonalWebsite,
+                    Github = app.Users.Profiles.linkGithub,
+                    Status = app.status
+                })
+                .GroupBy(app => new { app.JobId, app.JobTitle, app.FullName, app.UserId })
+                .Select(group => new ApllicationsDetailVM
+                {
+                    userId = group.Key.UserId,
+                    jobTitle = group.Key.JobTitle,
+                    fullName = group.Key.FullName,
+                    experience = string.Join(", ", group.SelectMany(g => g.Experiences).Distinct()),
+                    education = string.Join(", ", group.SelectMany(g => g.Educations).Distinct()),
+                    skills = string.Join(", ", group.SelectMany(g => g.Skills).Distinct()),
+                    linkPersonalWebsite = group.FirstOrDefault().PersonalWebsite,
+                    linkGithub = group.FirstOrDefault().Github,
+                    progress = string.Join(", ", group.Select(g => g.Status).Distinct())
+                });
+        }
+
 
         public Applications GetApplicationById(string applicationId)
         {
