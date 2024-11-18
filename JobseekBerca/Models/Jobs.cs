@@ -15,6 +15,7 @@ namespace JobseekBerca.Models
         public string? requirement { get; set; }
         public string? location { get; set; }
         public DateTime? postDate { get; set; }
+        public DateTime? dueDate { get; set; }
 
 
 
