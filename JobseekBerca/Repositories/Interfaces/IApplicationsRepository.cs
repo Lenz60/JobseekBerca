@@ -11,6 +11,6 @@ namespace JobseekBerca.Repositories.Interfaces
         Applications GetApplicationById(string applicationId);
         IEnumerable<ApplicationsVM.UserApplicationsVM> GetUserApplications(string userId);
         int AddApplications(Applications jobs);
-        int UpdateApplications(Applications applications);
+        int UpdateApplications(ApplicationUpdateVM applications);
     }
 }

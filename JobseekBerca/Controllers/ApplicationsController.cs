@@ -2,6 +2,7 @@ using JobseekBerca.Helper;
 using JobseekBerca.Models;
 using JobseekBerca.Repositories;
 using JobseekBerca.Repositories.Interfaces;
+using JobseekBerca.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
@@ -108,8 +109,8 @@ namespace JobseekBerca.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPut]
-        public IActionResult UpdateApplications(Applications applications)
+        [HttpPatch]
+        public IActionResult UpdateApplications(ApplicationsVM.ApplicationUpdateVM applications)
         {
             //var nullableFields = new HashSet<string> { "credentialId", "credentialLink", "description" };
             if (Whitespace.HasNullOrEmptyStringProperties(applications, out string propertyName))
