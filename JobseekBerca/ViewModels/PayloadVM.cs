@@ -9,6 +9,10 @@
             public string? email { get; set; }
 
         }
+        public class RefreshVM
+        {
+            public string? email { get; set; }
+        }
         public class ValidateVM
         {
             public string? token { get; set; }

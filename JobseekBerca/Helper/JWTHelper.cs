@@ -18,7 +18,7 @@ namespace JobseekBerca.Helper
             var secret = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(config["Jwt:Key"]));
             var key = new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
             var issuedAt = DateTime.UtcNow;
-            var expires = issuedAt.AddHours(24); // Token expires in 1 hour
+            var expires = issuedAt.AddHours(1); // Token expires in 1 hour
 
             var token = new JwtSecurityToken(
                 issuer: config["Jwt:Issuer"],
@@ -27,6 +27,29 @@ namespace JobseekBerca.Helper
                 {
                     new System.Security.Claims.Claim("uid", payload.userId),
                     new System.Security.Claims.Claim("role", payload.roleName),
+                    new System.Security.Claims.Claim("email", payload.email),
+                },
+                expires: expires,
+                notBefore: issuedAt,
+                signingCredentials: key
+            );
+            //return token;
+            var tokenResult = new JwtSecurityTokenHandler().WriteToken(token);
+            return tokenResult;
+        }
+
+        public static string GenerateRefreshToken(PayloadVM.RefreshVM payload, IConfiguration config)
+        {
+            var secret = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(config["Jwt:Key"]));
+            var key = new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
+            var issuedAt = DateTime.UtcNow;
+            var expires = issuedAt.AddHours(720); // Token expires in 30 days
+
+            var token = new JwtSecurityToken(
+                issuer: config["Jwt:Issuer"],
+                audience: config["Jwt:API"],
+                claims: new[]
+                {
                     new System.Security.Claims.Claim("email", payload.email),
                 },
                 expires: expires,
@@ -72,6 +95,21 @@ namespace JobseekBerca.Helper
             return payload;
         }
 
-        
+        public static Dictionary<string, object> DecodeAsObject(string token, IConfiguration config, bool skipVerification = false)
+        {
+            IJsonSerializer serializer = new JsonNetSerializer();
+            IDateTimeProvider provider = new UtcDateTimeProvider();
+            IJwtValidator validator = new JwtValidator(serializer, provider);
+            IBase64UrlEncoder urlEncoder = new JwtBase64UrlEncoder();
+            IJwtAlgorithm algorithm = new HMACSHA256Algorithm();
+            IJwtDecoder decoder = new JwtDecoder(serializer, validator, urlEncoder, algorithm);
+            var key = config["Jwt:Key"];
+
+            var payloadJson = decoder.Decode(token, key, verify: false);
+            var payload = JsonSerializer.Deserialize<Dictionary<string, object>>(payloadJson);
+            return payload;
+        }
+
+
     }
 }
