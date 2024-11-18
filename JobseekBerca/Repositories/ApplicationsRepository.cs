@@ -6,20 +6,23 @@ using JobseekBerca.Models;
 using JobseekBerca.Helper;
 using Microsoft.EntityFrameworkCore;
 using static JobseekBerca.ViewModels.ApplicationsVM;
+using static JobseekBerca.ViewModels.UserVM;
 
 namespace JobseekBerca.Repositories
 {
     public class ApplicationsRepository : IApplicationsRepository
     {
         private readonly MyContext _myContext;
+        private readonly SMTPHelper _smtpHelper;
 
         public const int INTERNAL_ERROR = -1;
         public const int SUCCESS = 1;
         public const int FAIL = 0;
 
-        public ApplicationsRepository(MyContext myContext)
+        public ApplicationsRepository(MyContext myContext, SMTPHelper smtphelper)
         {
             _myContext = myContext;
+            _smtpHelper = smtphelper;
         }
         public int CheckUserId(string userId)
         {
@@ -130,32 +133,185 @@ namespace JobseekBerca.Repositories
             }
         }
 
-        public int UpdateApplications(Applications applications)
+        private void SendApplicationStatusEmail(Users user, Jobs job, Profiles userDetail, Status status)
+        {
+            var toEmail = user.email ?? throw new ArgumentNullException(nameof(user.email));
+            var subject = $"BerCareer Application: {job.title}";
+            string body = "";
+
+            if (status == Status.Approved)
+            {
+                body = $@"
+                <html>
+                    <head>
+                        <style>
+                            body {{
+                                font-family: Arial, sans-serif;
+                                background-color: #f4f4f9;
+                                margin: 0;
+                                padding: 0;
+                            }}
+                            .container {{
+                                width: 100%;
+                                padding: 20px;
+                                background-color: #ffffff;
+                                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                                margin: 20px auto;
+                                max-width: 600px;
+                            }}
+                            .header {{
+                                background-color: #ffffff;
+                                color: white;
+                                padding: 10px 0;
+                                text-align: center;
+                            }}
+                            .content {{
+                                padding: 20px;
+                            }}
+                            .footer {{
+                                text-align: center;
+                                padding: 10px;
+                                font-size: 12px;
+                                color: #888;
+                            }}
+                        </style>
+                    </head>
+                    <body>
+                        <div class='container'>
+                            <div class='header'>
+                                <h1><img src='https://i.imgur.com/lzIYAOJ.png' alt='Company Logo'></h1>
+                            </div>
+                            <div class='content'>
+                                <h2>{job.title}</h2>
+                                <h4>Berca Hardayaperkasa - {job.location}</h4>   
+                                <p>Dear {userDetail.fullName}</p>
+                                <p>We are pleased to inform you that after reviewing your application and interview, we have selected you for the {job.title} position at Berca Hardayaperkasa. 
+                                    Congratulations!</p>
+                                <p>Your skills and experience impressed us, and we are excited to welcome you to our team. 
+                                    We believe you will make a valuable contribution to our projects and collaborate well with our development team.</p>
+                                <p>We will be reaching out shortly to discuss the next steps, including your start date, onboarding process, and other details related to your role. 
+                                    In the meantime, if you have any questions or need further information, feel free to reach out to us..</p>
+                                <p>Once again, congratulations, and we look forward to working with you soon!</p>
+                            </div>
+                            <div class='footer'>
+                                <p>&copy; 2024 BerCareer. All rights reserved.</p>
+                            </div>
+                        </div>
+                    </body>
+                </html>";
+            }
+            else if (status == Status.Rejected)
+            {
+                body = $@"
+                <html>
+                    <head>
+                        <style>
+                            body {{
+                                font-family: Arial, sans-serif;
+                                background-color: #f4f4f9;
+                                margin: 0;
+                                padding: 0;
+                            }}
+                            .container {{
+                                width: 100%;
+                                padding: 20px;
+                                background-color: #ffffff;
+                                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                                margin: 20px auto;
+                                max-width: 600px;
+                            }}
+                            .header {{
+                                background-color: #ffffff;
+                                color: white;
+                                padding: 10px 0;
+                                text-align: center;
+                            }}
+                            .content {{
+                                padding: 20px;
+                            }}
+                            .footer {{
+                                text-align: center;
+                                padding: 10px;
+                                font-size: 12px;
+                                color: #888;
+                            }}
+                        </style>
+                    </head>
+                    <body>
+                        <div class='container'>
+                            <div class='header'>
+                                <h1><img src='https://i.imgur.com/lzIYAOJ.png' alt='Company Logo' ></h1>
+                            </div>
+                            <div class='content'>
+                                <h2>{job.title}</h2>
+                                <h4>Berca Hardayaperkasa - {job.location}</h4>   
+                                <p>Dear {userDetail.fullName}</p> 
+                                <p>Thank you for your interest in joining Berca Hardayaperkasa as <strong>{job.title}</strong>.
+                                   Unfortunately, we have decided <strong>not to proceed with your application</strong> at this time.
+                                    </p>
+                                <p>We see that you have a strong potential to grow and we believe you will flourish more in your next career. 
+                                    We wish you all the best in your future endeavors.
+                                    </p>
+                            </div>
+                            <div class='footer'>
+                                <p>&copy; 2024 BerCareer. All rights reserved.</p>
+                            </div>
+                        </div>
+                    </body>
+                </html>";
+            }
+
+            try
+            {
+                _smtpHelper.SendEmail(toEmail, subject, body);
+
+            }
+            catch (HttpResponseExceptionHelper e)
+            {
+                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+            }
+        }
+
+
+        public int UpdateApplications(ApplicationsVM.ApplicationUpdateVM applicationVM)
         {
             try
             {
-                CheckUserId(applications.userId);
-                var checkRole = _myContext.Users
-                    .Where(x => x.userId == applications.userId)
-                    .Select(u => u.roleId).FirstOrDefault();
-                if (checkRole == "R02")
+                var userCheck = _myContext.Applications.Find(applicationVM.aplicationId);
+                CheckUserId(userCheck.userId);
+                //var checkRole = _myContext.Users
+                //    .Where(x => x.userId == applications.userId)
+                //    .Select(u => u.roleId).FirstOrDefault();
+                var applicationUpdate = _myContext.Applications.Find(applicationVM.aplicationId);
+                if (applicationUpdate == null)
                 {
-                    var checkApplication = _myContext.Applications.Find(applications.applicationId);
-                    if (checkApplication == null)
-                    {
-                        throw new HttpResponseExceptionHelper(404, "Invalid application id");
-                    }
-                    var newApplication = new Applications
-                    {
-                        applicationId = applications.applicationId,
-                        status = applications.status,
-                        jobId = applications.jobId,
-                        userId = applications.userId,
-                    };
-                    _myContext.Entry(checkApplication).State = EntityState.Detached;
-                    _myContext.Entry(newApplication).State = EntityState.Modified;
-                    return _myContext.SaveChanges();
+                    throw new HttpResponseExceptionHelper(404, "Invalid application id");
                 }
+                //var newApplication = new Applications
+                //{
+                //    applicationId = applications.aplicationId,
+                //    status = applications.status,
+                //};
+                applicationUpdate.status = applicationVM.status;
+                try
+                {
+                    var application = _myContext.Applications.Find(applicationVM.aplicationId);
+                    var user = _myContext.Users.Find(application.userId);
+                    var job = _myContext.Jobs.Find(application.jobId);
+                    var userDetail = _myContext.Profiles.Include(u => u.Users).Where(u => u.Users.userId == user.userId).FirstOrDefault();
+
+                    // Send email
+                    SendApplicationStatusEmail(user, job, userDetail, applicationVM.status);
+                }
+                catch (HttpResponseExceptionHelper e)
+                {
+                    throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
+                }
+
+                //_myContext.Entry(checkApplication).State = EntityState.Detached;
+                _myContext.Entry(applicationUpdate).State = EntityState.Modified;
+                return _myContext.SaveChanges();
+
                 throw new HttpResponseExceptionHelper(403, "Unauthorized access");
 
             }
@@ -168,6 +324,7 @@ namespace JobseekBerca.Repositories
                 throw new HttpResponseExceptionHelper(500, e.Message);
             }
         }
+
 
         public IEnumerable<ApplicationsVM.UserApplicationsVM> GetUserApplications(string userId)
         {
