@@ -23,6 +23,14 @@ namespace JobseekBerca.Controllers
             _usersRepository = usersRepository;
         }
 
+        [Authorize(Roles = "User")]
+        [HttpGet("Google")]
+        public IActionResult CheckGoogleUser(string userId)
+        {
+            var data = _usersRepository.CheckGoogleUser(userId);
+            return ResponseHTTP.CreateResponse(200, "Success", data);
+        }
+
         //Register
         [HttpPost]
         public IActionResult Register(UserVM.RegisterVM registerVM)
@@ -99,7 +107,7 @@ namespace JobseekBerca.Controllers
                 return ResponseHTTP.CreateResponse(500, e.Message);
             }
         }
-        
+
         [HttpPost("loginGoogle")]
         public IActionResult LoginGoogle(UserVM.LoginGoogleVM login)
         {
