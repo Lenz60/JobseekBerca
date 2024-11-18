@@ -7,8 +7,8 @@ namespace JobseekBerca.Models
 {
     public enum Gender
     {
-        Laki_laki,
-        Perempuan
+        Male,
+        Female
     }
     public class Profiles
     {
