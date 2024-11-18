@@ -342,7 +342,8 @@ namespace JobseekBerca.Repositories
                         jobRequirement = aj.Jobs.requirement,
                         jobSalary = aj.Jobs.salary,
                         jobStatus = aj.status.ToString(),
-                        applyDate = aj.applyDate.HasValue ? aj.applyDate.Value.ToString("yyyy-MM-dd") : null
+                        applyDate = aj.applyDate.HasValue ? aj.applyDate.Value.ToString("yyyy-MM-dd") : null,
+                        dueDate = aj.Jobs.dueDate.HasValue ? aj.Jobs.dueDate.Value.ToString("yyyy-MM-dd") : null
 
                     }).ToList();
                 if (applications == null)

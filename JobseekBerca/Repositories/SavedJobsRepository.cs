@@ -127,6 +127,7 @@ namespace JobseekBerca.Repositories
                     jobRequirement = savedJob.Job.requirement,
                     jobSalary = savedJob.Job.salary,
                     postDate = savedJob.Job.postDate.HasValue ? savedJob.Job.postDate.Value.ToString("yyyy-MM-dd") : "N/A",
+                    dueDate = savedJob.Job.dueDate.HasValue ? savedJob.Job.dueDate.Value.ToString("yyyy-MM-dd") : "N/A"
                 }).ToList();
 
                 //if (savedJobs == null || !savedJobs.Any())
