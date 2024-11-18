@@ -21,6 +21,9 @@
                 public string jobLocation { get; set; }
                 public string jobRequirement { get; set; }
                 public string jobSalary { get; set; }
-            }
+            public string postDate { get; set; }
+
+
+        }
     }
 }

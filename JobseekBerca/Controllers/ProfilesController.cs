@@ -65,7 +65,7 @@ namespace JobseekBerca.Controllers
             //{
             //    return ResponseHTTP.CreateResponse(400, "Birth Date is invalid!");
             //}
-            var nullableFields = new HashSet<string> { "summary", "address", "linkPersonalWebsite", "profileImage", "linkGithub" };
+            var nullableFields = new HashSet<string> { "summary", "address", "linkPersonalWebsite", "profileImage", "linkGithub", "phoneNumber", "gender", "address" };
             if (Whitespace.HasNullOrEmptyStringProperties(update, out string propertyName, nullableFields))
             {
                 return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
