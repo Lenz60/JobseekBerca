@@ -94,19 +94,16 @@ namespace JobseekBerca.Repositories
                     {
                         throw new HttpResponseExceptionHelper(404, "Invalid job id");
                     }
-                    var newJob = new Jobs
-                    {
-                        jobId = jobs.jobId,
-                        title = jobs.title,
-                        description = jobs.description,
-                        type = jobs.type,
-                        salary = jobs.salary,
-                        requirement = jobs.requirement,
-                        location = jobs.location,
-                        userId = jobs.userId
-                    };
-                    _myContext.Entry(checkJob).State = EntityState.Detached;
-                    _myContext.Entry(newJob).State = EntityState.Modified;
+                    checkJob.title = jobs.title;
+                    checkJob.description = jobs.description;
+                    checkJob.type = jobs.type;
+                    checkJob.salary = jobs.salary;
+                    checkJob.requirement = jobs.requirement;
+                    checkJob.location = jobs.location;
+                    checkJob.userId = jobs.userId;
+                    checkJob.dueDate = jobs.dueDate;
+
+                    _myContext.Entry(checkJob).State = EntityState.Modified;
                     return _myContext.SaveChanges();
                 }
                 throw new HttpResponseExceptionHelper(403, "Unauthorized access");
