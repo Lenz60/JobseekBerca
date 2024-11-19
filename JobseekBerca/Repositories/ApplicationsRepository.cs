@@ -61,6 +61,7 @@ namespace JobseekBerca.Repositories
                 .Include(app => app.Users.Profiles.Skills)
                 .Select(app => new
                 {
+                    ApplicationId = app.applicationId,
                     UserId = app.Users.userId,
                     JobId = app.Jobs.jobId,
                     JobTitle = app.Jobs.title,
@@ -75,6 +76,7 @@ namespace JobseekBerca.Repositories
                 .GroupBy(app => new { app.JobId, app.JobTitle, app.FullName, app.UserId })
                 .Select(group => new ApllicationsDetailVM
                 {
+                    applicationId = group.FirstOrDefault().ApplicationId,
                     userId = group.Key.UserId,
                     jobTitle = group.Key.JobTitle,
                     fullName = group.Key.FullName,
@@ -277,12 +279,12 @@ namespace JobseekBerca.Repositories
         {
             try
             {
-                var userCheck = _myContext.Applications.Find(applicationVM.aplicationId);
+                var userCheck = _myContext.Applications.Find(applicationVM.applicationId);
                 CheckUserId(userCheck.userId);
                 //var checkRole = _myContext.Users
                 //    .Where(x => x.userId == applications.userId)
                 //    .Select(u => u.roleId).FirstOrDefault();
-                var applicationUpdate = _myContext.Applications.Find(applicationVM.aplicationId);
+                var applicationUpdate = _myContext.Applications.Find(applicationVM.applicationId);
                 if (applicationUpdate == null)
                 {
                     throw new HttpResponseExceptionHelper(404, "Invalid application id");
@@ -295,13 +297,13 @@ namespace JobseekBerca.Repositories
                 applicationUpdate.status = applicationVM.status;
                 try
                 {
-                    var application = _myContext.Applications.Find(applicationVM.aplicationId);
+                    var application = _myContext.Applications.Find(applicationVM.applicationId);
                     var user = _myContext.Users.Find(application.userId);
                     var job = _myContext.Jobs.Find(application.jobId);
                     var userDetail = _myContext.Profiles.Include(u => u.Users).Where(u => u.Users.userId == user.userId).FirstOrDefault();
 
                     // Send email
-                    SendApplicationStatusEmail(user, job, userDetail, applicationVM.status);
+                    //SendApplicationStatusEmail(user, job, userDetail, applicationVM.status);
                 }
                 catch (HttpResponseExceptionHelper e)
                 {
