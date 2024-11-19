@@ -14,7 +14,7 @@ namespace JobseekBerca.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [EnableCors("AllowSpecificOrigin")]
-    [Authorize(Roles = "User")]
+    [Authorize(Roles = "User,Admin")]
     public class DetailsController : ControllerBase
     {
         public readonly CertificatesRepository _certificateRepository;

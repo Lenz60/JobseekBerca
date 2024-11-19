@@ -47,7 +47,8 @@ namespace JobseekBerca.Repositories
                     birthDate = profile.birthDate,
                     profileImage = profile.profileImage,
                     linkPersonalWebsite = profile.linkPersonalWebsite,
-                    linkGithub = profile.linkGithub,    
+                    linkGithub = profile.linkGithub,
+                    linkedin = profile.linkedin,
                 };
 
                 return getProfile;
@@ -134,7 +135,8 @@ namespace JobseekBerca.Repositories
                     birthDate = update.birthDate,
                     linkPersonalWebsite = update.linkPersonalWebsite,
                     linkGithub  = update.linkGithub,
-                    profileImage = update.profileImage
+                    profileImage = update.profileImage,
+                    linkedin = update.linkedin
                 };
                 _myContext.Entry(profile).State = EntityState.Detached;
                 _myContext.Entry(newProfile).State = EntityState.Modified;

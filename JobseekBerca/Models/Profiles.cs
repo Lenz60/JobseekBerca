@@ -25,6 +25,8 @@ namespace JobseekBerca.Models
         public string? profileImage { get; set; }
         public string? linkPersonalWebsite { get; set; }
         public string? linkGithub { get; set; }
+        public string? linkedin { get; set; }
+
         public virtual ICollection<Experiences> Experiences { get; set; } = new List<Experiences>();
         public virtual ICollection<Educations> Educations { get; set; } = new List<Educations>();
         public virtual ICollection<Skills> Skills { get; set; } = new List<Skills>();

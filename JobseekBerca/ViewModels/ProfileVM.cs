@@ -25,6 +25,8 @@ namespace JobseekBerca.ViewModels
             public string? profileImage { get; set; }
             public string? linkPersonalWebsite { get; set; }
             public string? linkGithub { get; set; }
+            public string? linkedin { get; set; }
+
 
 
         }
@@ -40,6 +42,7 @@ namespace JobseekBerca.ViewModels
             public string? linkPersonalWebsite {  get; set; }
             public string? profileImage { get; set; }
             public string? linkGithub {  get; set; }
+            public string? linkedin { get; set; }
 
         }
         public class GetAllVM
