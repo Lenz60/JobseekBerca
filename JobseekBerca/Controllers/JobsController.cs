@@ -107,9 +107,10 @@ namespace JobseekBerca.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPut]
+        [HttpPatch]
         public IActionResult UpdateJobs([FromBody] Jobs jobs)
         {
+            
             if (Whitespace.HasNullOrEmptyStringProperties(jobs, out string propertyName))
             {
                 return ResponseHTTP.CreateResponse(400, $"{propertyName} is required!");
