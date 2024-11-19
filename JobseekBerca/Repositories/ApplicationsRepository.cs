@@ -303,18 +303,21 @@ namespace JobseekBerca.Repositories
                     var userDetail = _myContext.Profiles.Include(u => u.Users).Where(u => u.Users.userId == user.userId).FirstOrDefault();
 
                     // Send email
-                    //SendApplicationStatusEmail(user, job, userDetail, applicationVM.status);
+                    //_myContext.Entry(checkApplication).State = EntityState.Detached;
+                    _myContext.Entry(applicationUpdate).State = EntityState.Modified;
+                    var updated = _myContext.SaveChanges();
+
+                    if (updated > 0)
+                    {
+                        SendApplicationStatusEmail(user, job, userDetail, applicationVM.status);
+                        return SUCCESS;
+                    }
+                    return FAIL;
                 }
                 catch (HttpResponseExceptionHelper e)
                 {
                     throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
                 }
-
-                //_myContext.Entry(checkApplication).State = EntityState.Detached;
-                _myContext.Entry(applicationUpdate).State = EntityState.Modified;
-                return _myContext.SaveChanges();
-
-                throw new HttpResponseExceptionHelper(403, "Unauthorized access");
 
             }
             catch (HttpResponseExceptionHelper e)
