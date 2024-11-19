@@ -205,62 +205,6 @@ namespace JobseekBerca.Repositories
             }
         }
 
-        //public string GenerateRefreshToken(string token, PayloadVM.GenerateVM payload)
-        //{
-        //    try
-        //    {
-        //        var check = _myContext.RefreshToken.Find(payload.userId);
-        //        if (check != null)
-        //        {
-        //            var refreshToken = _myContext.RefreshToken.Find(payload.userId);
-        //            try
-        //            {
-        //                JWTHelper.ValidateToken(refreshToken.refreshToken, _config);
-        //                return token;
-        //            }
-        //            catch (TokenExpiredException e)
-        //            {
-        //                var deleteRefreshToken = _myContext.RefreshToken.Remove(refreshToken);
-        //                _myContext.SaveChanges();
-        //                throw new HttpResponseExceptionHelper(401, e.Message);
-        //            }
-        //        }
-        //        else
-        //        {
-        //            var checkUser = _myContext.Users.Find(payload.userId);
-        //            if (checkUser == null)
-        //            {
-        //                throw new HttpResponseExceptionHelper(404, "User id is invalid");
-        //            }
-        //            var refreshPayload = new PayloadVM.RefreshVM
-        //            {
-        //                email = checkUser.email
-        //            };
-        //            try
-        //            {
-        //                var refreshToken = JWTHelper.GenerateRefreshToken(refreshPayload, _config);
-        //                //return generateRefreshToken;
-        //                _myContext.RefreshToken.Add(new RefreshToken
-        //                {
-        //                    userId = payload.userId,
-        //                    refreshToken = refreshToken
-        //                });
-        //                _myContext.SaveChanges();
-        //                return GenerateToken(payload);
-        //            }
-        //            catch (HttpResponseExceptionHelper e)
-        //            {
-        //                throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
-        //            }
-        //            //return refreshToken;
-        //        }
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw new HttpResponseExceptionHelper(500, e.Message);
-        //    }
-        //}
-
         public bool CreateRefreshToken(string userId)
         {
             // Check if the user is valid or not
@@ -362,7 +306,7 @@ namespace JobseekBerca.Repositories
                     gender = null,
                     address = null,
                     birthDate = null,
-                    profileImage = registervm.profileImage
+                    profileImage = null,
                 };
 
                 //Check first on Users Google, if there is no email given by parameter , then create , if not then login
@@ -478,6 +422,16 @@ namespace JobseekBerca.Repositories
             {
                 throw new HttpResponseExceptionHelper(500, e.Message);
             }
+        }
+
+        public bool CheckGoogleUser(string userId)
+        {
+            var check = _myContext.UsersGoogle.Find(userId);
+            if (check != null)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }
