@@ -20,6 +20,7 @@ namespace JobseekBerca.ViewModels
         }
         public class ApllicationsDetailVM
         {
+            public string applicationId { get; set; }
             public string userId { get; set; }
             public string jobTitle { get; set; }
             public string fullName { get; set; }
@@ -32,7 +33,7 @@ namespace JobseekBerca.ViewModels
         }
         public class ApplicationUpdateVM
         {
-            public string aplicationId { get; set; }
+            public string applicationId { get; set; }
             public Status status { get; set; }
 
         }
