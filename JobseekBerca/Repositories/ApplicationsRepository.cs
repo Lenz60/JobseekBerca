@@ -302,23 +302,17 @@ namespace JobseekBerca.Repositories
                     var job = _myContext.Jobs.Find(application.jobId);
                     var userDetail = _myContext.Profiles.Include(u => u.Users).Where(u => u.Users.userId == user.userId).FirstOrDefault();
 
-                    // Send email
                     //_myContext.Entry(checkApplication).State = EntityState.Detached;
-                    _myContext.Entry(applicationUpdate).State = EntityState.Modified;
-                    var updated = _myContext.SaveChanges();
 
-                    if (updated > 0)
-                    {
-                        SendApplicationStatusEmail(user, job, userDetail, applicationVM.status);
-                        return SUCCESS;
-                    }
-                    return FAIL;
+                    // Send email
+                    SendApplicationStatusEmail(user, job, userDetail, applicationVM.status);
                 }
                 catch (HttpResponseExceptionHelper e)
                 {
                     throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
                 }
-
+                _myContext.Entry(applicationUpdate).State = EntityState.Modified;
+                return _myContext.SaveChanges();
             }
             catch (HttpResponseExceptionHelper e)
             {
@@ -328,6 +322,7 @@ namespace JobseekBerca.Repositories
             {
                 throw new HttpResponseExceptionHelper(500, e.Message);
             }
+
         }
 
 
