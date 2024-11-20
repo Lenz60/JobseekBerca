@@ -16,6 +16,8 @@ namespace JobseekBerca.ViewModels
         public class GetVM
         {
             public string? userId { get; set; }
+            public string? email { get; set; }
+
             public string? fullName { get; set; }
             public string? summary { get; set; }
             public string? phoneNumber { get; set; }

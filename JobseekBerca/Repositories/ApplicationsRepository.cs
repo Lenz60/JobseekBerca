@@ -303,7 +303,7 @@ namespace JobseekBerca.Repositories
                     var userDetail = _myContext.Profiles.Include(u => u.Users).Where(u => u.Users.userId == user.userId).FirstOrDefault();
 
                     // Send email
-                    //SendApplicationStatusEmail(user, job, userDetail, applicationVM.status);
+                    SendApplicationStatusEmail(user, job, userDetail, applicationVM.status);
                 }
                 catch (HttpResponseExceptionHelper e)
                 {

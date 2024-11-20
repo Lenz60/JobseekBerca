@@ -30,7 +30,10 @@ namespace JobseekBerca.Repositories
                     .Select(u => u.roleId)
                     .FirstOrDefault();
 
-                var profile = _myContext.Profiles.Find(userId);
+                var profile = _myContext.Profiles
+                                .Include(u => u.Users)        
+                                .Where (x => x.userId == userId)
+                                 .FirstOrDefault();
                 if (profile == null)
                 {
                     throw new HttpResponseExceptionHelper(404, "Profile not found");
@@ -39,6 +42,7 @@ namespace JobseekBerca.Repositories
                 var getProfile = new ProfileVM.GetVM
                 {
                     userId = userId,
+                    email = profile.Users.email,
                     fullName = profile.fullName,
                     summary = profile.summary,
                     phoneNumber = profile.phoneNumber,
