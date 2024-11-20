@@ -36,5 +36,10 @@ namespace JobseekBerca.ViewModels
             public string? oldPassword { get; set; }
             public string? newPassword { get; set; }
         }
+        public class CheckGoogleVM
+        {
+            public bool isGoogle { get; set; }
+            public bool isVerified { get; set; }
+        }
     }
 }

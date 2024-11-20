@@ -8,7 +8,7 @@ namespace JobseekBerca.Repositories.Interfaces
     {
         int ChangePassword(UserVM.ChangePasswordVM changePassword);
         int Register(UserVM.RegisterVM registervm);
-        bool CheckGoogleUser(string userId);
+        UserVM.CheckGoogleVM CheckGoogleUser(string userId);
         int RegisterGoogle(UserVM.RegisterGoogleVM registervm);
         int Login(UserVM.LoginVM login);
         int LoginGoogle(UserVM.LoginGoogleVM login);

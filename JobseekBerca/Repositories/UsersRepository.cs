@@ -8,6 +8,7 @@ using JobseekBerca.Helper;
 using Microsoft.EntityFrameworkCore;
 using JobseekBerca.Helper.Interface;
 using JWT.Exceptions;
+using static JobseekBerca.ViewModels.ApplicationsVM;
 
 namespace JobseekBerca.Repositories
 {
@@ -115,7 +116,17 @@ namespace JobseekBerca.Repositories
                 }
 
                 cekData.password = HashingHelper.HashPassword(changePassword.newPassword);
-                _myContext.Users.Update(cekData);
+                var changePass = _myContext.Users.Update(cekData);
+                if (changePass != null)
+                {
+                    var googleAccount = _myContext.UsersGoogle.Find(changePassword.userId);
+                    if (googleAccount != null)
+                    {
+                        googleAccount.isVerified = true;
+                        _myContext.Entry(googleAccount).State = EntityState.Modified;
+                    }
+
+                }
                 return _myContext.SaveChanges();
 
             }
@@ -313,8 +324,9 @@ namespace JobseekBerca.Repositories
                 var newGoogle = new UsersGoogle
                 {
                     userId = newUser.userId,
+                    oauthId = registervm.oauthId,
                     email = newUser.email,
-                    oauthId = registervm.oauthId
+                    isVerified = false
                 };
 
                 //Sent password to email
@@ -424,14 +436,18 @@ namespace JobseekBerca.Repositories
             }
         }
 
-        public bool CheckGoogleUser(string userId)
+        public CheckGoogleVM CheckGoogleUser(string userId)
         {
             var check = _myContext.UsersGoogle.Find(userId);
             if (check != null)
             {
-                return true;
+                return new CheckGoogleVM
+                {
+                    isGoogle = true,
+                    isVerified = check.isVerified
+                };
             }
-            return false;
+            throw new HttpResponseExceptionHelper(404, "User id is invalid");
         }
     }
 }

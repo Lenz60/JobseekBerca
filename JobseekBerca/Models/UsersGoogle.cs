@@ -10,6 +10,7 @@ namespace JobseekBerca.Models
         public string? userId { get; set; }
         public string? email { get; set; }
         public string? oauthId { get; set; }
+        public bool isVerified { get; set; }
         [JsonIgnore]
         public virtual Users? Users { get; set; }
     }
