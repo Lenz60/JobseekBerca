@@ -302,6 +302,8 @@ namespace JobseekBerca.Repositories
                     var job = _myContext.Jobs.Find(application.jobId);
                     var userDetail = _myContext.Profiles.Include(u => u.Users).Where(u => u.Users.userId == user.userId).FirstOrDefault();
 
+                    //_myContext.Entry(checkApplication).State = EntityState.Detached;
+
                     // Send email
                     SendApplicationStatusEmail(user, job, userDetail, applicationVM.status);
                 }
@@ -309,13 +311,8 @@ namespace JobseekBerca.Repositories
                 {
                     throw new HttpResponseExceptionHelper(e.StatusCode, e.Message);
                 }
-
-                //_myContext.Entry(checkApplication).State = EntityState.Detached;
                 _myContext.Entry(applicationUpdate).State = EntityState.Modified;
                 return _myContext.SaveChanges();
-
-                throw new HttpResponseExceptionHelper(403, "Unauthorized access");
-
             }
             catch (HttpResponseExceptionHelper e)
             {
@@ -325,6 +322,7 @@ namespace JobseekBerca.Repositories
             {
                 throw new HttpResponseExceptionHelper(500, e.Message);
             }
+
         }
 
 
