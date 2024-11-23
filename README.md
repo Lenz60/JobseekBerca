@@ -32,3 +32,29 @@ Fill it like this
 }
 ```
 
+### Assigning Google SMTP account
+Input your SMTP application password inside of `appsettings.json` below the `ConnectionStrings` like this 
+```json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "JobseekBerca": "Server=<Your SQLServer Connection>;Database=JobseekBerca;user id=<Your SQLServer username>;password=<Your SQLServer password>;TrustServerCertificate=true;"
+  }
+  "SmtpSettings": {
+    "Server": "smtp.gmail.com",
+    "Port": 587,
+    "SenderName": "<Sender name you want to show up>",
+    "SenderEmail": "<Sender email you want to show up>",
+    "Username": "<Username of your SMTP google account>",
+    "Password": "<Your SMTP password application>"
+  }
+
+}
+```
+
